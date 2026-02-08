@@ -53,15 +53,8 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
     )
 
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton(" ᴀᴅᴅ 𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 ᴛᴏ ɢʀᴏᴜᴘ ", url="https://t.me/yourbot?startgroup=true")],
-        [
-            InlineKeyboardButton("🔍 sᴇᴀʀᴄʜ", switch_inline_query_current_chat=""),
-            InlineKeyboardButton("🏆 ᴛᴏᴘ ᴄʜᴀʀᴛs", callback_data="charts")
-        ],
-        [
-            InlineKeyboardButton("⚙️ sᴇᴛᴛɪɴɢs", callback_data="settings"),
-            InlineKeyboardButton("📜 ᴘʟᴀʏʟɪsᴛs", callback_data="playlists")
-        ],
+        [InlineKeyboardButton(" ᴀᴅᴅ 𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 ᴛᴏ ɢʀᴏᴜᴘ ", url="https://t.me/ProNovaMusicBot?startgroup=true")],
+        
         [InlineKeyboardButton("👑 ᴊᴏɪɴ ᴠɪᴘ ᴄʜᴀɴɴᴇʟ", url="https://t.me/Her4Eva")]
     ])
 
