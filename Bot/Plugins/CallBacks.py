@@ -12,21 +12,23 @@ async def vc_buttons(_, cq):
     if member.status not in (ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER):
         return await cq.answer(sc("only admins"), show_alert=True)
 
+    mention = cq.from_user.mention
+
     if cq.data == "vc_skip":
         await engine.vc.skip(chat_id)
-        await m.reply(sc(f"song skipped by {cq.from_user.mention}"))
+        await m.reply(sc("song skipped by") + " " + mention)
 
     elif cq.data == "vc_end":
         await engine.vc.stop(chat_id)
-        await m.reply(sc(f"playback ended by {cq.from_user.mention}"))
+        await m.reply(sc("playback ended by") + " " + mention)
 
     elif cq.data == "vc_pause":
         await engine.vc.pause(chat_id)
-        await m.reply(sc(f"paused by {cq.from_user.mention}"))
+        await m.reply(sc("paused by") + " " + mention)
 
     elif cq.data == "vc_resume":
         await engine.vc.resume(chat_id)
-        await m.reply(sc(f"resumed by {cq.from_user.mention}"))
+        await m.reply(sc("resumed by") + " " + mention)
 
     elif cq.data == "vc_previous":
         ok = await engine.vc.previous(chat_id)
