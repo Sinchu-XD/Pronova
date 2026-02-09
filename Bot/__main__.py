@@ -3,9 +3,9 @@ from AbhiCalls import idle, Plugin
 
 from Bot import bot, user, engine
 
-import Bot.plugins.Music
-import Bot.plugins.Admins
-import Bot.plugins.Callbacks
+import Bot.Plugins.Music
+import Bot.Plugins.Admins
+import Bot.Plugins.Callbacks
 
 from Bot.helpers.assistant import setup_assistant
 
