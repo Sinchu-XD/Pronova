@@ -21,7 +21,7 @@ async def skip(_, m):
         return await m.reply(sc("admins only"))
 
     await engine.vc.skip(m.chat.id)
-    await m.reply(sc(f"song skipped by {m.from_user.first_name}"))
+    await m.reply(sc("song skipped by") + " " + m.from_user.mention)
 
 
 # ───────── STOP ─────────
@@ -31,7 +31,7 @@ async def stop(_, m):
         return await m.reply(sc("admins only"))
 
     await engine.vc.stop(m.chat.id)
-    await m.reply(sc(f"playback ended by {m.from_user.first_name}"))
+    await m.reply(sc("playback ended by") + " " + m.from_user.mention)
 
 
 # ───────── PAUSE ─────────
@@ -41,7 +41,7 @@ async def pause(_, m):
         return await m.reply(sc("admins only"))
 
     await engine.vc.pause(m.chat.id)
-    await m.reply(sc(f"paused by {m.from_user.first_name}"))
+    await m.reply(sc("paused by") + " " + m.from_user.mention)
 
 
 # ───────── RESUME ─────────
@@ -51,7 +51,7 @@ async def resume(_, m):
         return await m.reply(sc("admins only"))
 
     await engine.vc.resume(m.chat.id)
-    await m.reply(sc(f"resumed by {m.from_user.first_name}"))
+    await m.reply(sc("resumed by") + " " + m.from_user.mention)
 
 
 # ───────── PREVIOUS ─────────
@@ -64,7 +64,7 @@ async def previous(_, m):
     if not ok:
         return await m.reply(sc("no previous song"))
 
-    await m.reply(sc(f"previous played by {m.from_user.first_name}"))
+    await m.reply(sc("previous played by") + " " + m.from_user.mention)
 
 
 # ───────── QUEUE ─────────
@@ -83,4 +83,4 @@ async def queue(_, m):
         text += f"{i}. {s.title} ({s.duration_sec}s)\n"
 
     await m.reply(text)
-  
+    
