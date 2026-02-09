@@ -1,6 +1,7 @@
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from Bot import bot
 
 # --- ꜱᴇᴛᴛɪɴɢꜱ ---
 BOT_NAME = "𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 𝑩𝒐𝒕🌷"
@@ -60,10 +61,10 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
 
     await message.edit_text(dashboard, reply_markup=buttons)
 
-@Client.on_message(filters.command("start") & filters.private)
+@bot.on_message(filters.command("start") & filters.private)
 async def start_handler(client, message: Message):
     # User's first name for personalization
-    user_name = message.from_user.first_name
+    user_name = message.from_user.mention
     
     # 1. Premium Sticker Entry
     await message.reply_sticker(MUSIC_STICKER)
@@ -73,3 +74,4 @@ async def start_handler(client, message: Message):
     
     # 3. Start Animation
     await pronova_ultimate_animation(status_msg, user_name)
+    
