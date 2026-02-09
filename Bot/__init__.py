@@ -21,4 +21,4 @@ user = Client(
     session_string=SESSION_STRING
 )
 
-engine = VoiceEngine(user)
+engine = VoiceEngine(user, cookies=COOKIES)
