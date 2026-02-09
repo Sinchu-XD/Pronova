@@ -7,7 +7,7 @@ import Bot.Plugins.Music
 import Bot.Plugins.Admins
 import Bot.Plugins.CallBacks
 
-from Bot.helpers.assistant import setup_assistant
+from Bot.Helper.Assistant import setup_assistant
 
 
 async def main():
