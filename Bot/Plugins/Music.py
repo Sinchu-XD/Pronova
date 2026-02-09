@@ -1,9 +1,21 @@
 from pyrogram import filters
+from pyrogram.enums import ChatMemberStatus
+
 from Bot import bot, engine
 from Bot.Helper.Assistant import get_ass
 from Bot.Helper.Font import sc
 
 
+# ───────── ADMIN CHECK ─────────
+async def is_admin(chat_id, user_id):
+    member = await bot.get_chat_member(chat_id, user_id)
+    return member.status in (
+        ChatMemberStatus.ADMINISTRATOR,
+        ChatMemberStatus.OWNER
+    )
+
+
+# ───────── PLAY ─────────
 @bot.on_message(filters.command("play"))
 async def play(_, m):
     try:
@@ -35,12 +47,16 @@ async def play(_, m):
         await m.reply(sc("unable to play song"))
 
 
+# ───────── PLAY FORCE (ADMINS ONLY) ─────────
 @bot.on_message(filters.command("playforce"))
 async def playforce(_, m):
     try:
         await m.delete()
     except:
         pass
+
+    if not await is_admin(m.chat.id, m.from_user.id):
+        return await m.reply(sc("admins only"))
 
     if not await get_ass(m.chat.id, m):
         return
