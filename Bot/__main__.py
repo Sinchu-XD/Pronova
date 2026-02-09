@@ -1,7 +1,14 @@
 import os
 from AbhiCalls import idle, Plugin
 
-from Bot import bot, user, engine, ASSISTANT_ID, ASSISTANT_USERNAME, Music  # handlers import
+from Bot import bot, user, engine
+
+import Bot.plugins.Music
+import Bot.plugins.Admins
+import Bot.plugins.Callbacks
+
+from Bot.helpers.assistant import setup_assistant
+
 
 async def main():
     os.environ["TEXT"] = "Powered By Abhishek ✨"
@@ -11,12 +18,10 @@ async def main():
     await user.start()
     await engine.start()
 
-    # fetch assistant
-    me = await user.get_me()
-    Music.ASSISTANT_ID = me.id
-    Music.ASSISTANT_USERNAME = me.username or "NoUsername"
+    await setup_assistant()
 
     engine.vc.load_plugin(Plugin(bot))
     await idle()
+
 
 bot.run(main())
