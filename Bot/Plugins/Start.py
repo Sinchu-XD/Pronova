@@ -48,7 +48,7 @@ def get_theme_line():
 
 
 def get_badge(user_id: int):
-    if user_id in [123456789]:  # change owner id
+    if user_id in [6444277321]:  # change owner id
         return "👑 Owner"
     return "✨ Premium"
 
