@@ -7,7 +7,8 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from Bot import bot
 
 
-BOT_NAME = "𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 𝑩𝒐𝒕"
+# Mixed Font Brand
+BOT_NAME = "𝗣𝗿𝗼𝗻𝗼𝘃𝗮 𝑴𝒖𝒔𝗶𝗰 𝗕𝗼𝘁"
 DEV_NAME = "Abhi"
 MUSIC_STICKER = "CAACAgUAAx0CZzxBYgABB2zoaYjxDe3E6k4Spe_lmG-wfKUjdrYAAm8VAAKaqulXWtKxQoF0Y_UeBA"
 
@@ -36,10 +37,10 @@ async def safe_edit(msg: Message, text: str, **kwargs):
 def get_greeting():
     hour = datetime.utcnow().hour
     if hour < 12:
-        return "Good Morning"
+        return "𝗚𝗼𝗼𝗱 𝗠𝗼𝗿𝗻𝗶𝗻𝗴"
     if hour < 18:
-        return "Good Afternoon"
-    return "Good Evening"
+        return "𝗚𝗼𝗼𝗱 𝗔𝗳𝘁𝗲𝗿𝗻𝗼𝗼𝗻"
+    return "𝗚𝗼𝗼𝗱 𝗘𝘃𝗲𝗻𝗶𝗻𝗴"
 
 
 def get_theme_line():
@@ -48,9 +49,9 @@ def get_theme_line():
 
 
 def get_badge(user_id: int):
-    if user_id in [6444277321]:  # change owner id
-        return "👑 Owner"
-    return "✨ Premium"
+    if user_id in [6444277321]:
+        return "👑 𝗢𝘄𝗻𝗲𝗿"
+    return "✨ 𝗣𝗿𝗲𝗺𝗶𝘂𝗺"
 
 
 # ==========================
@@ -72,15 +73,15 @@ async def pronova_god_animation(message: Message, user):
             message,
             f"""
 {line}
-⚡ **Pronova Hyper System Boot**
+⚡ **𝗣𝗿𝗼𝗻𝗼𝘃𝗮 𝗛𝘆𝗽𝗲𝗿 𝗦𝘆𝘀𝘁𝗲𝗺 𝗕𝗼𝗼𝘁**
 {line}
 
-`Loading Modules`
+`𝗟𝗼𝗮𝗱𝗶𝗻𝗴 𝗠𝗼𝗱𝘂𝗹𝗲𝘀`
 [{filled}{empty}] {i}%
 
-🧠 AI Engine : Online
-💽 Memory    : Stable
-📡 Network   : Connected
+🧠 𝗔𝗜 𝗘𝗻𝗴𝗶𝗻𝗲 : `Online`
+💽 𝗠𝗲𝗺𝗼𝗿𝘆    : `Stable`
+📡 𝗡𝗲𝘁𝘄𝗼𝗿𝗸   : `Connected`
 """,
         )
         await asyncio.sleep(0.25)
@@ -93,14 +94,14 @@ async def pronova_god_animation(message: Message, user):
         message,
         f"""
 {line}
-🧠 **Hardware Scan**
+🧠 **𝗛𝗮𝗿𝗱𝘄𝗮𝗿𝗲 𝗦𝗰𝗮𝗻**
 {line}
 
-🎮 GPU Usage : {gpu}%
-💾 RAM Usage : {ram}%
-📶 Ping      : 0.0001 ms
+🎮 𝗚𝗣𝗨 : `{gpu}%`
+💾 𝗥𝗔𝗠 : `{ram}%`
+📶 𝗣𝗶𝗻𝗴: `0.0001 ms`
 
-✅ Optimized
+✅ 𝗢𝗽𝘁𝗶𝗺𝗶𝘇𝗲𝗱
 """,
     )
     await asyncio.sleep(1)
@@ -119,12 +120,12 @@ async def pronova_god_animation(message: Message, user):
                 message,
                 f"""
 {line}
-🎚 **Audio Spectrum Initializing**
+🎚 **𝗔𝘂𝗱𝗶𝗼 𝗦𝗽𝗲𝗰𝘁𝗿𝘂𝗺 𝗜𝗻𝗶𝘁𝗶𝗮𝗹𝗶𝘇𝗶𝗻𝗴**
 {line}
 
 `{frame}`
 
-🎧 Calibrating sound waves...
+🎧 𝗖𝗮𝗹𝗶𝗯𝗿𝗮𝘁𝗶𝗻𝗴...
 """,
             )
             await asyncio.sleep(0.25)
@@ -138,19 +139,18 @@ async def pronova_god_animation(message: Message, user):
 🎧 **{BOT_NAME}**
 {badge}
 
-⏵ Status : `Ready`
-🧠 AI     : `Adaptive`
-🔊 Mode   : `24-Bit Ultra`
-📡 Speed  : `Realtime`
+⏵ 𝗦𝘁𝗮𝘁𝘂𝘀 : `Ready`
+🧠 𝗔𝗜     : `Adaptive`
+🔊 𝗠𝗼𝗱𝗲   : `24-Bit Ultra`
+📡 𝗦𝗽𝗲𝗲𝗱  : `Realtime`
 
 {line}
-✨ Tap below to continue
+✨ 𝗧𝗮𝗽 𝗯𝗲𝗹𝗼𝘄 𝘁𝗼 𝗰𝗼𝗻𝘁𝗶𝗻𝘂𝗲
 {line}
 
-⚙️ Dev : {DEV_NAME}
+⚙️ 𝗗𝗲𝘃 : {DEV_NAME}
 """
 
-    # ✅ ONLY TWO BUTTONS
     buttons = InlineKeyboardMarkup([
         [
             InlineKeyboardButton(
@@ -183,6 +183,6 @@ async def start_handler(client, message: Message):
     except Exception:
         pass
 
-    status = await message.reply_text("⚡ Booting Pronova...", quote=True)
+    status = await message.reply_text("⚡ 𝗕𝗼𝗼𝘁𝗶𝗻𝗴 𝗣𝗿𝗼𝗻𝗼𝘃𝗮...", quote=True)
     await pronova_god_animation(status, message.from_user)
     
