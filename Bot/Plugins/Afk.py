@@ -4,15 +4,16 @@ from pyrogram.types import Message
 from Bot import bot
 
 
+# ================= STORAGE =================
 # user_id : {reason, time}
 AFK_USERS = {}
 
-# anti spam (cooldown)
+# cooldown for mention spam
 LAST_REPLY = {}
 
 
 # ================= TIME FORMAT =================
-def format_time(seconds):
+def format_time(seconds: int):
     minutes, sec = divmod(int(seconds), 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
@@ -54,15 +55,18 @@ I will inform anyone who mentions you.
     )
 
 
-# ================= REMOVE AFK =================
-@bot.on_message(filters.text & ~filters.command("afk"))
-async def remove_afk(_, message: Message):
+# ================= AUTO REMOVE AFK =================
+# ANY MESSAGE from that user = back
+@bot.on_message(filters.all & ~filters.command("afk"))
+async def auto_remove_afk(_, message: Message):
     user = message.from_user
     if not user:
         return
 
     if user.id in AFK_USERS:
-        duration = format_time(time.time() - AFK_USERS[user.id]["time"])
+        data = AFK_USERS[user.id]
+        duration = format_time(time.time() - data["time"])
+
         del AFK_USERS[user.id]
 
         await message.reply_text(
@@ -75,7 +79,7 @@ async def remove_afk(_, message: Message):
         )
 
 
-# ================= WATCH MENTIONS =================
+# ================= WATCH TAG / REPLY =================
 @bot.on_message(filters.group)
 async def afk_watcher(_, message: Message):
     if not message.from_user:
@@ -83,11 +87,11 @@ async def afk_watcher(_, message: Message):
 
     targets = []
 
-    # reply check
+    # reply target
     if message.reply_to_message and message.reply_to_message.from_user:
         targets.append(message.reply_to_message.from_user)
 
-    # mention check
+    # mention target
     if message.mentions:
         targets.extend(message.mentions)
 
@@ -95,9 +99,10 @@ async def afk_watcher(_, message: Message):
         if user.id not in AFK_USERS:
             continue
 
-        # cooldown 15 sec per user
+        # anti spam → 15 sec per user per chat
         key = (message.chat.id, user.id)
         last = LAST_REPLY.get(key, 0)
+
         if time.time() - last < 15:
             continue
 
@@ -115,4 +120,4 @@ async def afk_watcher(_, message: Message):
 📝 𝗥𝗲𝗮𝘀𝗼𝗻 : `{data['reason']}`
 """
         )
-      
+        
