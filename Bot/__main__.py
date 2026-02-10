@@ -7,12 +7,13 @@ from Bot import bot, user, engine
 import Bot.Plugins.Music
 import Bot.Plugins.Admins
 import Bot.Plugins.CallBacks
+impott Bot.Plugins.Start
 
 from Bot.Helper.Assistant import setup_assistant
 
 
 async def main():
-    os.environ["TEXT"] = "Powered By Abhishek ✨"
+    os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
 
     print("🤖 bot start")
