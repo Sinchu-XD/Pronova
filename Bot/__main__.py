@@ -8,6 +8,7 @@ import Bot.Plugins.Music
 import Bot.Plugins.Admins
 import Bot.Plugins.CallBacks
 import Bot.Plugins.Start
+import Bot.Plugins.Afk
 
 from Bot.Helper.Assistant import setup_assistant
 
