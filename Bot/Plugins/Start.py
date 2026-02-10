@@ -1,26 +1,23 @@
 import asyncio
+import random
+from datetime import datetime
+
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from Bot import bot
 
 
-BOT_NAME = "𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 𝑩𝒐𝒕🌷"
+BOT_NAME = "𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 𝑩𝒐𝒕"
+DEV_NAME = "Abhi"
 MUSIC_STICKER = "CAACAgUAAx0CZzxBYgABB2zoaYjxDe3E6k4Spe_lmG-wfKUjdrYAAm8VAAKaqulXWtKxQoF0Y_UeBA"
 
-
-# ==========================
-# SMART SAFE EDIT
-# ==========================
 _last_text_cache = {}
 
 
+# ==========================
+# SAFE EDIT
+# ==========================
 async def safe_edit(msg: Message, text: str, **kwargs):
-    """
-    Smart edit:
-    - skip same text
-    - flood safe
-    - deleted message safe
-    """
     key = (msg.chat.id, msg.id)
 
     if _last_text_cache.get(key) == text:
@@ -29,70 +26,149 @@ async def safe_edit(msg: Message, text: str, **kwargs):
     try:
         await msg.edit_text(text, **kwargs)
         _last_text_cache[key] = text
-
-    except Exception as e:
-        if "MESSAGE_NOT_MODIFIED" in str(e):
-            return
-        print("[StartUI:Edit]", e)
+    except Exception:
+        pass
 
 
 # ==========================
-# ULTIMATE ANIMATION
+# HELPERS
 # ==========================
-async def pronova_ultimate_animation(message: Message, user_name: str):
-    print("[StartUI] animation start")
+def get_greeting():
+    hour = datetime.utcnow().hour
+    if hour < 12:
+        return "Good Morning"
+    if hour < 18:
+        return "Good Afternoon"
+    return "Good Evening"
 
-    # Phase 1
-    boot_phases = [
-        "🌐 ᴄᴏɴɴᴇᴄᴛɪɴɢ ᴛᴏ ᴘʀᴏɴᴏᴠᴀ ɴᴇᴛᴡᴏʀᴋ...",
-        "⚙️ ʟᴏᴀᴅɪɴɢ ᴀᴜᴅɪᴏ ᴅʀɪᴠᴇʀs [ᴠ8.2]...",
-        "🛡️ sᴇᴄᴜʀɪɴɢ sᴇssɪᴏɴ ᴇɴᴅ-ᴛᴏ-ᴇɴᴅ...",
-        "✅ sʏsᴛᴇᴍ ʀᴇᴀᴅʏ. ᴡᴇʟᴄᴏᴍᴇ ʙᴀᴄᴋ."
+
+def get_theme_line():
+    themes = ["🟣", "🔵", "🟢", "🔴"]
+    return random.choice(themes) * 30
+
+
+def get_badge(user_id: int):
+    if user_id in [123456789]:  # change owner id
+        return "👑 Owner"
+    return "✨ Premium"
+
+
+# ==========================
+# GOD LEVEL ANIMATION
+# ==========================
+async def pronova_god_animation(message: Message, user):
+    print("[StartUI] GOD animation start")
+
+    greeting = get_greeting()
+    badge = get_badge(user.id)
+    line = get_theme_line()
+
+    # ================= Loader =================
+    for i in range(0, 101, 10):
+        filled = "█" * (i // 10)
+        empty = "░" * (10 - i // 10)
+
+        await safe_edit(
+            message,
+            f"""
+{line}
+⚡ **Pronova Hyper System Boot**
+{line}
+
+`Loading Modules`
+[{filled}{empty}] {i}%
+
+🧠 AI Engine : Online
+💽 Memory    : Stable
+📡 Network   : Connected
+""",
+        )
+        await asyncio.sleep(0.25)
+
+    # ================= Hardware =================
+    gpu = random.randint(40, 90)
+    ram = random.randint(30, 80)
+
+    await safe_edit(
+        message,
+        f"""
+{line}
+🧠 **Hardware Scan**
+{line}
+
+🎮 GPU Usage : {gpu}%
+💾 RAM Usage : {ram}%
+📶 Ping      : 0.0001 ms
+
+✅ Optimized
+""",
+    )
+    await asyncio.sleep(1)
+
+    # ================= Equalizer =================
+    eq_frames = [
+        "▁ ▂ ▃ ▄ ▅ ▆ ▇",
+        "▇ ▆ ▅ ▄ ▃ ▂ ▁",
+        "▂ ▄ ▆ ▇ ▆ ▄ ▂",
+        "▃ ▅ ▇ ▅ ▃ ▂ ▁",
     ]
 
-    for phase in boot_phases:
-        await safe_edit(message, f"<code>{phase}</code>")
-        await asyncio.sleep(0.5)
+    for _ in range(2):
+        for frame in eq_frames:
+            await safe_edit(
+                message,
+                f"""
+{line}
+🎚 **Audio Spectrum Initializing**
+{line}
 
-    # Phase 2
-    header = f"🎼 **{BOT_NAME}**\n"
-    line = "⎯" * 30 + "\n"
+`{frame}`
 
-    welcome_text = (
-        f"ʜᴇʟʟᴏ {user_name}, ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ɴᴇxᴛ ᴇʀᴀ ᴏꜰ ᴍᴜsɪᴄ ᴅᴇʟɪᴠᴇʀʏ. "
-        "ᴇxᴘᴇʀɪᴇɴᴄᴇ ᴛʜᴇ ᴅᴇᴘᴛʜ ᴏꜰ sᴏᴜɴᴅ."
-    )
+🎧 Calibrating sound waves...
+""",
+            )
+            await asyncio.sleep(0.25)
 
-    words = welcome_text.split()
-    current = ""
+    # ================= FINAL DASHBOARD =================
+    dashboard = f"""
+{line}
+👋 **{greeting}, {user.mention}**
+{line}
 
-    for word in words:
-        current += word + " "
-        await safe_edit(message, f"{header}{line}*“ {current}▎ ”*\n{line}")
-        await asyncio.sleep(0.12)
+🎧 **{BOT_NAME}**
+{badge}
 
-    # Final
-    dashboard = (
-        f"🎼 **{BOT_NAME}**\n"
-        f"{line}"
-        "●─────────── 𝟶𝟻:𝟸𝟶\n"
-        "⇆   ㅤ◁   ㅤ❚❚   ㅤ▷   ㅤ↻\n"
-        f"{line}"
-        "👤 **ᴜsᴇʀ:** `ᴘʀᴇᴍɪᴜᴍ`\n"
-        "🔊 **ǫᴜᴀʟɪᴛʏ:** `𝟸𝟺-ʙɪᴛ`\n"
-        "📶 **ʟᴀᴛᴇɴᴄʏ:** `ᴜʟᴛʀᴀ ʟᴏᴡ`\n"
-        f"{line}"
-        "✨ **ᴛᴀᴘ ʙᴇʟᴏᴡ ᴛᴏ sᴛᴀʀᴛ**"
-    )
+⏵ Status : `Ready`
+🧠 AI     : `Adaptive`
+🔊 Mode   : `24-Bit Ultra`
+📡 Speed  : `Realtime`
 
+{line}
+✨ Tap below to continue
+{line}
+
+⚙️ Dev : {DEV_NAME}
+"""
+
+    # ✅ ONLY TWO BUTTONS
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton(" ᴀᴅᴅ 𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 ᴛᴏ ɢʀᴏᴜᴘ ", url="https://t.me/ProNovaMusicBot?startgroup=true")],
-        [InlineKeyboardButton("👑 ᴊᴏɪɴ ᴠɪᴘ ᴄʜᴀɴɴᴇʟ", url="https://t.me/Her4Eva")]
+        [
+            InlineKeyboardButton(
+                "➕ Add To Group",
+                url="https://t.me/ProNovaMusicBot?startgroup=true"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "👑 VIP Channel",
+                url="https://t.me/Her4Eva"
+            )
+        ]
     ])
 
     await safe_edit(message, dashboard, reply_markup=buttons)
 
-    print("[StartUI] animation end")
+    print("[StartUI] GOD animation end")
 
 
 # ==========================
@@ -102,21 +178,11 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
 async def start_handler(client, message: Message):
     print("[StartUI] /start")
 
-    user_name = message.from_user.mention
-
     try:
         await message.reply_sticker(MUSIC_STICKER)
-    except Exception as e:
-        print("[StartUI:Sticker]", e)
+    except Exception:
+        pass
 
-    try:
-        status_msg = await message.reply_text(
-            "📶 `ɪɴɪᴛɪᴀʟɪᴢɪɴɢ 𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑪𝒐𝒓𝒆...`",
-            quote=True
-        )
-    except Exception as e:
-        print("[StartUI:InitMsg]", e)
-        return
-
-    await pronova_ultimate_animation(status_msg, user_name)
-  
+    status = await message.reply_text("⚡ Booting Pronova...", quote=True)
+    await pronova_god_animation(status, message.from_user)
+    
