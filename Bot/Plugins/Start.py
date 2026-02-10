@@ -87,7 +87,8 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
 
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton(" ᴀᴅᴅ 𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 ᴛᴏ ɢʀᴏᴜᴘ ", url="https://t.me/ProNovaMusicBot?startgroup=true")],
-        [InlineKeyboardButton("👑 ᴊᴏɪɴ ᴠɪᴘ ᴄʜᴀɴɴᴇʟ", url="https://t.me/Her4Eva")]
+        [InlineKeyboardButton(" ᴊᴏɪɴ ᴠɪᴘ ᴄʜᴀɴɴᴇʟ", url="https://t.me/Her4Eva")],
+        [InlineKeyboardButton(" 👑 ʙᴏᴛ ᴏᴡɴᴇʀ ", url="https://t.me/WtfShia")]
     ])
 
     await safe_edit(message, dashboard, reply_markup=buttons)
