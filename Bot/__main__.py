@@ -7,7 +7,7 @@ from Bot import bot, user, engine
 import Bot.Plugins.Music
 import Bot.Plugins.Admins
 import Bot.Plugins.CallBacks
-impott Bot.Plugins.Start
+import Bot.Plugins.Start
 
 from Bot.Helper.Assistant import setup_assistant
 
