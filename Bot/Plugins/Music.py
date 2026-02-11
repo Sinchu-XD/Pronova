@@ -18,20 +18,20 @@ async def is_admin(chat_id, user_id):
         ChatMemberStatus.OWNER
     )
 
-
 # ───────── BAN CHECK HELPER ─────────
 async def check_ban(m):
     if not m.from_user:
         return True
 
     uid = m.from_user.id
+    chat_id = m.chat.id
 
     if await is_gbanned(uid):
         await m.reply(sc("you are gbanned"))
         return True
 
-    if await is_banned(uid):
-        await m.reply(sc("you are banned"))
+    if await is_banned(chat_id, uid):
+        await m.reply(sc("you are banned in this chat"))
         return True
 
     return False
