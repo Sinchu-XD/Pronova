@@ -6,9 +6,9 @@ from pyrogram.errors import FloodWait, UserIsBlocked, PeerIdInvalid
 from Bot import bot
 from Bot.Helper.Font import sc
 
-from Bot.Database.users import get_users, remove_user
-from Bot.Database.stats import inc_lifetime
-from Bot.Database.core import db
+from Bot.Database.Users import get_users, remove_user
+from Bot.Database.Stats import inc_lifetime
+from Bot.Database.Core import db
 
 
 SUDO_USERS = [7952773964]
