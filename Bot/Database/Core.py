@@ -3,7 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 
 # ================= CONFIG =================
-MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://Sinchu:Sinchu@sinchu.qwijj.mongodb.net/?appName=Sinchu")
+MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://Vexera:Vexera@vexera.wtrsmyc.mongodb.net/?appName=Vexera")
 DB_NAME = os.getenv("DB_NAME", "Pronova")
 
 
