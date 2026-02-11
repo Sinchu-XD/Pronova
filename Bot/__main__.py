@@ -8,9 +8,7 @@ from Bot.Database.core import setup_database
 from Bot.Database.users import add_user
 from Bot.Database.chats import add_chat
 from Bot.Database.activity import update_gc_activity
-from Bot.Database.stats import inc_daily
-from Bot.Database.ranking import *
-from Bot.Database.songs import *
+from Bot.Database.stats import inc_daily, inc_lifetime
 
 import Bot.Plugins.Music
 import Bot.Plugins.Admins
@@ -46,20 +44,40 @@ async def main():
     print("🔌 load plugin")
     engine.vc.load_plugin(Plugin(bot))
 
-    # ========= AUTO REGISTER =========
+    # ========= GLOBAL TRACKER =========
     @bot.on_message(filters.private | filters.group)
     async def register(_, message):
-        await add_user(message.from_user)
-        await add_chat(message.chat.id)
+        try:
+            # skip anonymous / service / empty
+            if not message.from_user:
+                return
 
-        if message.chat.type != "private" and message.from_user:
-            await update_gc_activity(
-                message.chat.id,
-                message.from_user.id
-            )
+            # skip bots
+            if message.from_user.is_bot:
+                return
+
+            # save user & chat
+            await add_user(message.from_user)
+            await add_chat(message.chat.id)
+
+            # group activity
+            if message.chat.type != "private":
+                await update_gc_activity(
+                    message.chat.id,
+                    message.from_user.id
+                )
+
+            # command auto count
+            if message.command:
+                await inc_lifetime("commands")
+                await inc_daily("commands")
+
+        except Exception as e:
+            print("Register Error:", e)
 
     print("💤 idle")
     await idle()
+
 
 if __name__ == "__main__":
     bot.loop.run_until_complete(main())
