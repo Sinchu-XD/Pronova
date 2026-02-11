@@ -96,6 +96,7 @@ async def main():
     asyncio.create_task(daily_gc_report(bot))
 
     # ========= GLOBAL TRACKER =========
+    """
     @bot.on_message(filters.private | filters.group)
     async def register(_, message):
         try:
@@ -119,7 +120,7 @@ async def main():
 
         except Exception as e:
             print("Register Error:", e)
-
+"""
     @bot.on_message(filters.command("test"))
     async def test_cmd(_, m):
         print("TEST COMMAND ARRIVED")
