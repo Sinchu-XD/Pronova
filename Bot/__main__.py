@@ -9,13 +9,16 @@ from pyrogram import filters
 
 from Bot import bot, user, engine
 
+# ===== DATABASE =====
 from Bot.Database.Core import setup_database
 from Bot.Database.Users import add_user
 from Bot.Database.Chats import add_chat
 from Bot.Database.Activity import update_gc_activity
 from Bot.Database.Stats import inc_daily, inc_lifetime
 
+# ===== AUTO =====
 from Bot.Plugins.GetActivity import daily_gc_report
+
 from Bot.Helper.Assistant import setup_assistant
 
 
@@ -26,7 +29,7 @@ def load_plugins():
     PLUGINS = [
         "Music",
         "Admins",
-        "CallBacks",
+        "Callbacks",
         "Start",
         "Afk",
         "GetActivity",
@@ -60,7 +63,7 @@ async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
 
-    # ===== LOAD PLUGINS FIRST =====
+    # ✅ LOAD PLUGINS ONLY ONCE
     load_plugins()
 
     print("🤖 bot start")
@@ -81,7 +84,7 @@ async def main():
     print("🔌 load vc plugin")
     engine.vc.load_plugin(Plugin(bot))
 
-    # ===== GLOBAL TRACKER FIRST =====
+    # ========= GLOBAL TRACKER =========
     @bot.on_message(filters.private | filters.group)
     async def register(_, message):
         try:
@@ -103,9 +106,6 @@ async def main():
 
         except Exception as e:
             print("Register Error:", e)
-
-    # ===== LOAD PLUGINS =====
-    load_plugins()
 
     # ===== HANDLER INFO =====
     print("\n📡 Handler Info")
