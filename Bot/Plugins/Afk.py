@@ -32,7 +32,7 @@ def format_time(seconds: int):
 # ================= SET AFK =================
 @bot.on_message(filters.command("afk"))
 async def set_afk(_, message: Message):
-    user = message.from_user
+    user = message.from_user.mention
     if not user:
         return
 
@@ -46,7 +46,7 @@ async def set_afk(_, message: Message):
         sc(f"""
 AFK Enabled
 
-{user.mention}
+{user}
 Reason : {reason}
 
 I will inform anyone who mentions you.
@@ -57,7 +57,7 @@ I will inform anyone who mentions you.
 # ================= AUTO REMOVE =================
 @bot.on_message(filters.all & ~filters.command("afk"))
 async def auto_remove_afk(_, message: Message):
-    user = message.from_user
+    user = message.from_user.mention
     if not user:
         return
 
@@ -78,7 +78,7 @@ async def auto_remove_afk(_, message: Message):
         sc(f"""
 Welcome Back
 
-{user.mention}
+{user}
 Away for : {duration}
 """)
     )
