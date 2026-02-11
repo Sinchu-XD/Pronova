@@ -17,6 +17,9 @@ import Bot.Plugins.Admins
 import Bot.Plugins.CallBacks
 import Bot.Plugins.Start
 import Bot.Plugins.Afk
+import Bot.Plugins.GetActivity
+import Bot.Plugins.Broadcast
+import Bot.Plugins.Stats
 
 from Bot.Helper.Assistant import setup_assistant
 
