@@ -5,14 +5,7 @@ from Bot import bot, engine
 from Bot.Helper.Font import sc
 
 # ===== DB =====
-from Bot.Database.Bans import is_banned, is_gbanned
-from Bot.Database.Stats import inc_lifetime, inc_daily
-
-
-# helper
-async def count_command():
-    await inc_lifetime("commands")
-    await inc_daily("commands")
+from Bot.Database.bans import is_banned, is_gbanned
 
 
 # ───────── ADMIN CHECK ─────────
@@ -24,21 +17,26 @@ async def is_admin(chat_id, user_id):
     )
 
 
+# helper
+async def check_ban(m):
+    uid = m.from_user.id
+    if await is_gbanned(uid):
+        await m.reply("🚫 You are gbanned.")
+        return True
+    if await is_banned(uid):
+        await m.reply("🚫 You are banned.")
+        return True
+    return False
+
+
 # ───────── SKIP ─────────
 @bot.on_message(filters.command("skip"))
 async def skip(_, m):
-    uid = m.from_user.id
+    if await check_ban(m):
+        return
 
-    # ===== BAN CHECK =====
-    if await is_gbanned(uid):
-        return await m.reply("🚫 You are gbanned.")
-    if await is_banned(uid):
-        return await m.reply("🚫 You are banned.")
-
-    if not await is_admin(m.chat.id, uid):
+    if not await is_admin(m.chat.id, m.from_user.id):
         return await m.reply(sc("admins only"))
-
-    await count_command()
 
     await engine.vc.skip(m.chat.id)
     await m.reply(sc("song skipped by") + " " + m.from_user.mention)
@@ -47,17 +45,11 @@ async def skip(_, m):
 # ───────── STOP ─────────
 @bot.on_message(filters.command(["stop", "end"]))
 async def stop(_, m):
-    uid = m.from_user.id
+    if await check_ban(m):
+        return
 
-    if await is_gbanned(uid):
-        return await m.reply("🚫 You are gbanned.")
-    if await is_banned(uid):
-        return await m.reply("🚫 You are banned.")
-
-    if not await is_admin(m.chat.id, uid):
+    if not await is_admin(m.chat.id, m.from_user.id):
         return await m.reply(sc("admins only"))
-
-    await count_command()
 
     await engine.vc.stop(m.chat.id)
     await m.reply(sc("playback ended by") + " " + m.from_user.mention)
@@ -66,17 +58,11 @@ async def stop(_, m):
 # ───────── PAUSE ─────────
 @bot.on_message(filters.command("pause"))
 async def pause(_, m):
-    uid = m.from_user.id
+    if await check_ban(m):
+        return
 
-    if await is_gbanned(uid):
-        return await m.reply("🚫 You are gbanned.")
-    if await is_banned(uid):
-        return await m.reply("🚫 You are banned.")
-
-    if not await is_admin(m.chat.id, uid):
+    if not await is_admin(m.chat.id, m.from_user.id):
         return await m.reply(sc("admins only"))
-
-    await count_command()
 
     await engine.vc.pause(m.chat.id)
     await m.reply(sc("paused by") + " " + m.from_user.mention)
@@ -85,17 +71,11 @@ async def pause(_, m):
 # ───────── RESUME ─────────
 @bot.on_message(filters.command("resume"))
 async def resume(_, m):
-    uid = m.from_user.id
+    if await check_ban(m):
+        return
 
-    if await is_gbanned(uid):
-        return await m.reply("🚫 You are gbanned.")
-    if await is_banned(uid):
-        return await m.reply("🚫 You are banned.")
-
-    if not await is_admin(m.chat.id, uid):
+    if not await is_admin(m.chat.id, m.from_user.id):
         return await m.reply(sc("admins only"))
-
-    await count_command()
 
     await engine.vc.resume(m.chat.id)
     await m.reply(sc("resumed by") + " " + m.from_user.mention)
@@ -104,17 +84,11 @@ async def resume(_, m):
 # ───────── PREVIOUS ─────────
 @bot.on_message(filters.command("previous"))
 async def previous(_, m):
-    uid = m.from_user.id
+    if await check_ban(m):
+        return
 
-    if await is_gbanned(uid):
-        return await m.reply("🚫 You are gbanned.")
-    if await is_banned(uid):
-        return await m.reply("🚫 You are banned.")
-
-    if not await is_admin(m.chat.id, uid):
+    if not await is_admin(m.chat.id, m.from_user.id):
         return await m.reply(sc("admins only"))
-
-    await count_command()
 
     ok = await engine.vc.previous(m.chat.id)
     if not ok:
@@ -126,17 +100,11 @@ async def previous(_, m):
 # ───────── QUEUE ─────────
 @bot.on_message(filters.command("queue"))
 async def queue(_, m):
-    uid = m.from_user.id
+    if await check_ban(m):
+        return
 
-    if await is_gbanned(uid):
-        return await m.reply("🚫 You are gbanned.")
-    if await is_banned(uid):
-        return await m.reply("🚫 You are banned.")
-
-    if not await is_admin(m.chat.id, uid):
+    if not await is_admin(m.chat.id, m.from_user.id):
         return await m.reply(sc("admins only"))
-
-    await count_command()
 
     q = engine.vc.player.queues.get(m.chat.id)
     if not q or not q.items:
