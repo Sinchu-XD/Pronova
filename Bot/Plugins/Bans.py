@@ -53,7 +53,9 @@ async def ban(_, m):
         return await m.reply(sc("admins only"))
 
     await ban_user(m.chat.id, target.id)
-    await m.reply(sc(f"user banned from using bot\n\n{target.mention}"))
+
+    text = sc("user banned from using bot")
+    await m.reply(f"{text}\n\n{target.mention}")
 
 
 # ================= UNBAN =================
@@ -70,7 +72,9 @@ async def unban(_, m):
         return await m.reply(sc("admins only"))
 
     await unban_user(m.chat.id, target.id)
-    await m.reply(sc(f"user unbanned\n\n{target.mention}"))
+
+    text = sc("user unbanned")
+    await m.reply(f"{text}\n\n{target.mention}")
 
 
 # ================= GBAN =================
@@ -87,7 +91,9 @@ async def gban(_, m):
         return await m.reply(sc("reply to user"))
 
     await gban_user(target.id)
-    await m.reply(sc(f"user globally banned\n\n{target.mention}"))
+
+    text = sc("user globally banned")
+    await m.reply(f"{text}\n\n{target.mention}")
 
 
 # ================= UNGBAN =================
@@ -104,7 +110,9 @@ async def ungban(_, m):
         return await m.reply(sc("reply to user"))
 
     await ungban_user(target.id)
-    await m.reply(sc(f"user globally unbanned\n\n{target.mention}"))
+
+    text = sc("user globally unbanned")
+    await m.reply(f"{text}\n\n{target.mention}")
 
 
 # ================= CHECK =================
