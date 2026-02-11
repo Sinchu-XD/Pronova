@@ -1,18 +1,24 @@
 from pyrogram import filters
 
 from Bot import bot
-#from config import SUDO_USERS
+from Bot.Helper.Font import sc
 
-from Bot.Database.Users import total_users
-from Bot.Database.Chats import total_chats
-from Bot.Database.Songs import most_played
-from Bot.Database.Ranking import top_groups, top_users
-from Bot.Database.Stats import get_lifetime, sum_range
-from Bot.Database.Bans import total_banned
+from Bot.Database.users import total_users
+from Bot.Database.chats import total_chats
+from Bot.Database.songs import most_played
+from Bot.Database.ranking import top_groups, top_users
+from Bot.Database.stats import get_lifetime, sum_range
+from Bot.Database.bans import total_banned
 
 
-@bot.on_message(filters.command("stats")) # filters.user(SUDO_USERS))
+# put your ID
+SUDO_USERS = [7952773964]
+
+
+@bot.on_message(filters.command("stats") & filters.user(SUDO_USERS))
 async def stats(_, m):
+    msg = await m.reply(sc("fetching analytics..."))
+
     users = await total_users()
     chats = await total_chats()
     songs = await get_lifetime("songs")
@@ -27,31 +33,41 @@ async def stats(_, m):
     mp = await most_played(3)
 
     text = f"""
-📊 **BOT ANALYTICS**
+BOT ANALYTICS
 
-👥 Users : {users}
-💬 Chats : {chats}
-🎵 Songs : {songs}
-🛠 Commands : {commands}
-🚫 Banned : {banned}
+Users : {users}
+Chats : {chats}
+Songs : {songs}
+Commands : {commands}
+Banned : {banned}
 
-📈 **Growth**
+Growth
 7 Days : {weekly_users}
 30 Days : {monthly_users}
 
-🏆 **Top Groups**
+Top Groups
 """
 
-    for i, (cid, s) in enumerate(tg, 1):
-        text += f"{i}. `{cid}` → {s}\n"
+    if tg:
+        for i, (cid, s) in enumerate(tg, 1):
+            text += f"{i}. {cid} → {s}\n"
+    else:
+        text += "No data\n"
 
-    text += "\n🏆 **Top Users**\n"
-    for i, (uid, c) in enumerate(tu, 1):
-        text += f"{i}. `{uid}` → {c}\n"
+    text += "\nTop Users\n"
 
-    text += "\n🔥 **Most Played**\n"
-    for i, (name, c) in enumerate(mp, 1):
-        text += f"{i}. {name} → {c}\n"
+    if tu:
+        for i, (uid, c) in enumerate(tu, 1):
+            text += f"{i}. {uid} → {c}\n"
+    else:
+        text += "No data\n"
 
-    await m.reply(text)
-  
+    text += "\nMost Played\n"
+
+    if mp:
+        for i, (name, c) in enumerate(mp, 1):
+            text += f"{i}. {name} → {c}\n"
+    else:
+        text += "No data\n"
+
+    await msg.edit(sc(text))
