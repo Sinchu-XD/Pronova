@@ -1,6 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 
-MONGO_URL = "mongodb://localhost:27017"
+MONGO_URL = "mongodb+srv://Sinchu:Sinchu@sinchu.qwijj.mongodb.net/?appName=Sinchu"
 DB_NAME = "Pronova"
 
 client = AsyncIOMotorClient(MONGO_URL)
