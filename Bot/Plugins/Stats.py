@@ -1,7 +1,7 @@
 from pyrogram import filters
 
 from Bot import bot
-from config import SUDO_USERS
+#from config import SUDO_USERS
 
 from Bot.Database.Users import total_users
 from Bot.Database.Chats import total_chats
@@ -11,7 +11,7 @@ from Bot.Database.Stats import get_lifetime, sum_range
 from Bot.Database.Bans import total_banned
 
 
-@bot.on_message(filters.command("stats") & filters.user(SUDO_USERS))
+@bot.on_message(filters.command("stats")) # filters.user(SUDO_USERS))
 async def stats(_, m):
     users = await total_users()
     chats = await total_chats()
