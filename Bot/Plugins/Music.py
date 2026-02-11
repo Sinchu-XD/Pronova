@@ -5,10 +5,10 @@ from Bot import bot, engine
 from Bot.Helper.Assistant import get_ass
 from Bot.Helper.Font import sc
 
-from Bot.Database.songs import inc_song_play
-from Bot.Database.bans import is_banned, is_gbanned
-from Bot.Database.users import add_user
-from Bot.Database.chats import add_chat
+from Bot.Database.Songs import inc_song_play
+from Bot.Database.Bans import is_banned, is_gbanned
+from Bot.Database.Users import add_user
+from Bot.Database.Chats import add_chat
 
 
 # ================= ADMIN CHECK =================
