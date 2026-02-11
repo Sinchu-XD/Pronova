@@ -2,22 +2,29 @@ import asyncio
 from datetime import datetime
 import pytz
 
-from Bot.Database.Activity import get_gc_activity
-from Bot.Database.Chats import get_all_chats
+from Bot.Database.activity import get_gc_activity
+from Bot.Database.chats import get_all_chats
+from Bot.Helper.Font import sc
 
 
 IST = pytz.timezone("Asia/Kolkata")
 
+# stop multiple sends in same day
+last_sent_date = None
+
 
 async def daily_gc_report(app):
-    print("📊 Daily GC Report Started")
+    global last_sent_date
+    print("📊 Daily GC Report System Started")
 
     while True:
         now = datetime.now(IST)
+        today = now.strftime("%d-%m-%Y")
 
-        # midnight check
-        if now.hour == 0 and now.minute == 0:
-            print("🕛 Sending daily reports")
+        # run once at midnight
+        if now.hour == 0 and now.minute == 0 and last_sent_date != today:
+            print("🕛 Sending Daily GC Reports")
+            last_sent_date = today
 
             async for chat_id in get_all_chats():
                 try:
@@ -30,7 +37,7 @@ async def daily_gc_report(app):
                     total_messages = data.get("total_messages", 0)
                     active_users = len(users)
 
-                    # top 3
+                    # ===== TOP 3 =====
                     top = sorted(
                         users.items(),
                         key=lambda x: x[1],
@@ -38,30 +45,34 @@ async def daily_gc_report(app):
                     )[:3]
 
                     text = f"""
-📊 **Daily Group Activity**
+📊 Daily Group Activity
 
 👥 Active Users : {active_users}
 💬 Total Messages : {total_messages}
 
-🏆 **Top 3 Users**
+🏆 Top 3 Users
 """
 
                     for i, (uid, count) in enumerate(top, start=1):
                         try:
                             user = await app.get_users(int(uid))
                             mention = user.mention
-                        except:
+                        except Exception:
                             mention = f"`{uid}`"
 
                         text += f"\n{i}. {mention} → {count}"
 
-                    await app.send_message(chat_id, text)
+                    # ===== SEND WITH FONT =====
+                    await app.send_message(chat_id, sc(text))
 
-                except Exception:
-                    pass
+                    # ===== flood protection =====
+                    await asyncio.sleep(2)
 
-            # wait so duplicate na ho
+                except Exception as e:
+                    print(f"Report Error in {chat_id}:", e)
+
+            # extra sleep so minute repeat na ho
             await asyncio.sleep(60)
 
         await asyncio.sleep(20)
-      
+        
