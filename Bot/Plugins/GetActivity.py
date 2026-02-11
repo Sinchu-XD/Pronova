@@ -2,8 +2,8 @@ import asyncio
 from datetime import datetime
 import pytz
 
-from Bot.Database.activity import get_gc_activity
-from Bot.Database.chats import get_all_chats
+from Bot.Database.Activity import get_gc_activity
+from Bot.Database.Chats import get_all_chats
 from Bot.Helper.Font import sc
 
 
