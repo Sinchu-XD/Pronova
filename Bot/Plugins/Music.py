@@ -5,9 +5,15 @@ from Bot import bot, engine
 from Bot.Helper.Assistant import get_ass
 from Bot.Helper.Font import sc
 
+from Bot.Database.Songs import inc_song_play
+from Bot.Database.Bans import is_banned, is_gbanned
 
-# ───────── ADMIN CHECK ─────────
+
+# ================= ADMIN CHECK =================
 async def is_admin(chat_id, user_id):
+    if not user_id:
+        return False
+
     member = await bot.get_chat_member(chat_id, user_id)
     return member.status in (
         ChatMemberStatus.ADMINISTRATOR,
@@ -15,68 +21,112 @@ async def is_admin(chat_id, user_id):
     )
 
 
-# ───────── PLAY ─────────
-@bot.on_message(filters.command("play"))
-async def play(_, m):
+# ================= BAN CHECK =================
+async def check_ban(m):
+    if not m.from_user:
+        return True
+
+    uid = m.from_user.id
+    chat_id = m.chat.id
+
+    if await is_gbanned(uid):
+        await m.reply(sc("you are gbanned"))
+        return True
+
+    if await is_banned(chat_id, uid):
+        await m.reply(sc("you are banned in this chat"))
+        return True
+
+    return False
+
+
+# ================= SAFE DELETE =================
+async def safe_delete(m):
     try:
         await m.delete()
     except:
         pass
 
-    if not await get_ass(m.chat.id, m):
+
+# ================= PLAY LOGIC =================
+async def handle_play(m, force=False):
+    if await check_ban(m):
         return
 
-    reply = m.reply_to_message
-
-    if reply and (reply.voice or reply.audio):
-        path = await reply.download()
-        song, _ = await engine.vc.play_file(
-            m.chat.id, path, m.from_user.mention, reply=reply
-        )
-        if not song:
-            await m.reply(sc("unable to play audio"))
+    if not m.from_user:
         return
 
-    if len(m.command) < 2:
-        return await m.reply(sc("usage play song name"))
-
-    query = m.text.split(None, 1)[1]
-    song, _ = await engine.vc.play(m.chat.id, query, m.from_user.mention)
-
-    if not song:
-        await m.reply(sc("unable to play song"))
-
-
-# ───────── PLAY FORCE (ADMINS ONLY) ─────────
-@bot.on_message(filters.command("playforce"))
-async def playforce(_, m):
-    try:
-        await m.delete()
-    except:
-        pass
-
-    if not await is_admin(m.chat.id, m.from_user.id):
+    if force and not await is_admin(m.chat.id, m.from_user.id):
         return await m.reply(sc("admins only"))
 
     if not await get_ass(m.chat.id, m):
         return
 
-    await engine.vc.stop(m.chat.id)
+    if force:
+        try:
+            await engine.vc.stop(m.chat.id)
+        except Exception as e:
+            print("VC Stop Error:", e)
 
     reply = m.reply_to_message
 
+    # ===== AUDIO =====
     if reply and (reply.voice or reply.audio):
-        path = await reply.download()
-        song, _ = await engine.vc.play_file(
-            m.chat.id, path, m.from_user.mention, reply=reply
-        )
+        try:
+            path = await reply.download()
+        except Exception as e:
+            print("Download Error:", e)
+            return await m.reply(sc("download failed"))
+
+        try:
+            song, title = await engine.vc.play_file(
+                m.chat.id,
+                path,
+                m.from_user.mention,
+                reply=reply
+            )
+        except Exception as e:
+            print("Play File Error:", e)
+            return await m.reply(sc("unable to play audio"))
+
         if not song:
-            await m.reply(sc("force play failed"))
+            return await m.reply(sc("unable to play audio"))
+
+        await inc_song_play(m.chat.id, title or "telegram audio")
         return
 
+    # ===== QUERY =====
     if len(m.command) < 2:
-        return await m.reply(sc("usage playforce song"))
+        return await m.reply(sc("give song name"))
 
     query = m.text.split(None, 1)[1]
-    await engine.vc.play(m.chat.id, query, m.from_user.mention)
-  
+
+    try:
+        song, title = await engine.vc.play(
+            m.chat.id,
+            query,
+            m.from_user.mention
+        )
+    except Exception as e:
+        print("Play Query Error:", e)
+        return await m.reply(sc("unable to play song"))
+
+    if not song:
+        return await m.reply(sc("unable to play song"))
+
+    await inc_song_play(m.chat.id, title or query)
+
+
+# ================= PLAY =================
+@bot.on_message(filters.command("play"))
+async def play(_, m):
+    await safe_delete(m)
+    await handle_play(m, force=False)
+
+
+# ================= PLAY FORCE =================
+@bot.on_message(filters.command("playforce"))
+async def playforce(_, m):
+    await safe_delete(m)
+    await handle_play(m, force=True)
+                                
