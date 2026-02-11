@@ -4,7 +4,7 @@ from Bot import bot, engine
 from Bot.Helper.Font import sc
 
 # ===== DB =====
-from Bot.Database.Bans import is_banned, is_gbanned
+from Bot.Database.bans import is_banned, is_gbanned
 
 
 @bot.on_callback_query()
@@ -23,8 +23,8 @@ async def vc_buttons(_, cq):
         if await is_gbanned(uid):
             return await cq.answer(sc("you are gbanned"), show_alert=True)
 
-        if await is_banned(uid):
-            return await cq.answer(sc("you are banned"), show_alert=True)
+        if await is_banned(chat_id, uid):
+            return await cq.answer(sc("you are banned in this chat"), show_alert=True)
 
         # ===== ADMIN CHECK =====
         member = await bot.get_chat_member(chat_id, uid)
@@ -67,4 +67,4 @@ async def vc_buttons(_, cq):
             await cq.answer("Error", show_alert=True)
         except:
             pass
-            
+        
