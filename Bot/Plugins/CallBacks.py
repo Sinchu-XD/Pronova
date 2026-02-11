@@ -3,13 +3,24 @@ from pyrogram.enums import ChatMemberStatus
 from Bot import bot, engine
 from Bot.Helper.Font import sc
 
-# ===== DB =====
 from Bot.Database.Bans import is_banned, is_gbanned
+
+
+# ================= SAFE VC =================
+async def safe_action(action, chat_id):
+    try:
+        return await action(chat_id)
+    except Exception as e:
+        print("Callback VC Error:", e)
+        return None
 
 
 @bot.on_callback_query()
 async def vc_buttons(_, cq):
     try:
+        if not cq.message:
+            return await cq.answer()
+
         m = cq.message
         chat_id = m.chat.id
         user = cq.from_user
@@ -19,16 +30,15 @@ async def vc_buttons(_, cq):
 
         uid = user.id
 
-        # ===== BAN CHECK =====
+        # ===== BAN =====
         if await is_gbanned(uid):
             return await cq.answer(sc("you are gbanned"), show_alert=True)
 
         if await is_banned(chat_id, uid):
             return await cq.answer(sc("you are banned in this chat"), show_alert=True)
 
-        # ===== ADMIN CHECK =====
+        # ===== ADMIN =====
         member = await bot.get_chat_member(chat_id, uid)
-
         if member.status not in (
             ChatMemberStatus.ADMINISTRATOR,
             ChatMemberStatus.OWNER
@@ -39,32 +49,36 @@ async def vc_buttons(_, cq):
 
         # ===== ACTIONS =====
         if cq.data == "vc_skip":
-            await engine.vc.skip(chat_id)
+            await safe_action(engine.vc.skip, chat_id)
             await m.reply(sc("song skipped by") + " " + mention)
 
         elif cq.data == "vc_end":
-            await engine.vc.stop(chat_id)
+            await safe_action(engine.vc.stop, chat_id)
             await m.reply(sc("playback ended by") + " " + mention)
 
         elif cq.data == "vc_pause":
-            await engine.vc.pause(chat_id)
+            await safe_action(engine.vc.pause, chat_id)
             await m.reply(sc("paused by") + " " + mention)
 
         elif cq.data == "vc_resume":
-            await engine.vc.resume(chat_id)
+            await safe_action(engine.vc.resume, chat_id)
             await m.reply(sc("resumed by") + " " + mention)
 
         elif cq.data == "vc_previous":
-            ok = await engine.vc.previous(chat_id)
+            ok = await safe_action(engine.vc.previous, chat_id)
             if not ok:
                 await m.reply(sc("no previous song"))
+
+        else:
+            # unknown callback
+            return await cq.answer()
 
         await cq.answer()
 
     except Exception as e:
-        print("Callback Error:", e)
+        print("Callback Fatal Error:", e)
         try:
             await cq.answer("Error", show_alert=True)
         except:
             pass
-        
+            
