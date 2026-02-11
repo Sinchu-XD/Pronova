@@ -2,22 +2,20 @@ import os
 import asyncio
 import importlib
 import traceback
+import signal
 
 from AbhiCalls import idle, Plugin
 from pyrogram import filters
 
 from Bot import bot, user, engine
 
-# ===== DATABASE =====
 from Bot.Database.Core import setup_database
 from Bot.Database.Users import add_user
 from Bot.Database.Chats import add_chat
 from Bot.Database.Activity import update_gc_activity
 from Bot.Database.Stats import inc_daily, inc_lifetime
 
-# ===== AUTO =====
 from Bot.Plugins.GetActivity import daily_gc_report
-
 from Bot.Helper.Assistant import setup_assistant
 
 
@@ -28,7 +26,7 @@ def load_plugins():
     PLUGINS = [
         "Music",
         "Admins",
-        "Callbacks",  # FIXED
+        "Callbacks",
         "Start",
         "Afk",
         "GetActivity",
@@ -37,23 +35,24 @@ def load_plugins():
         "Bans"
     ]
 
-    loaded = []
-    failed = []
-
     for plug in PLUGINS:
         try:
             importlib.import_module(f"Bot.Plugins.{plug}")
             print(f"✅ {plug}")
-            loaded.append(plug)
         except Exception:
             print(f"❌ {plug}")
             traceback.print_exc()
-            failed.append(plug)
 
-    print("\n==============================")
-    print(f"✅ Loaded : {len(loaded)}")
-    print(f"❌ Failed : {len(failed)}")
     print("==============================\n")
+
+
+# ================= SAFE TASK =================
+async def safe_task(coro, name):
+    try:
+        await coro
+    except Exception:
+        print(f"{name} crashed:")
+        traceback.print_exc()
 
 
 # ================= MAIN =================
@@ -61,7 +60,6 @@ async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
 
-    # ===== START CORE FIRST =====
     print("🤖 bot start")
     await bot.start()
 
@@ -80,29 +78,11 @@ async def main():
     print("🔌 load vc plugin")
     engine.vc.load_plugin(Plugin(bot))
 
-    # ===== NOW LOAD PLUGINS =====
-    load_plugins()
-
-    # ===== HANDLER COUNT =====
-    print("\n📡 Handler Info")
-    total = 0
-    for group, handlers in bot.dispatcher.groups.items():
-        print(f"Group {group}: {len(handlers)} handlers")
-        total += len(handlers)
-    print(f"Total Handlers: {total}\n")
-
-    # ===== START AUTOMATION =====
-    print("📊 starting daily report scheduler")
-    asyncio.create_task(daily_gc_report(bot))
-
-
-    # ========= GLOBAL TRACKER =========
+    # ===== GLOBAL TRACKER FIRST =====
     @bot.on_message(filters.private | filters.group)
     async def register(_, message):
         try:
-            if not message.from_user:
-                return
-            if message.from_user.is_bot:
+            if not message.from_user or message.from_user.is_bot:
                 return
 
             await add_user(message.from_user)
@@ -121,15 +101,47 @@ async def main():
         except Exception as e:
             print("Register Error:", e)
 
+    # ===== LOAD PLUGINS =====
+    load_plugins()
 
-    @bot.on_message(filters.command("test"))
-    async def test_cmd(_, m):
-        await m.reply("I AM ALIVE")
+    # ===== HANDLER INFO =====
+    print("\n📡 Handler Info")
+    total = 0
+    for group, handlers in bot.dispatcher.groups.items():
+        print(f"Group {group}: {len(handlers)} handlers")
+        total += len(handlers)
+    print(f"Total Handlers: {total}\n")
+
+    # ===== START AUTOMATION =====
+    print("📊 starting daily report scheduler")
+    asyncio.create_task(safe_task(daily_gc_report(bot), "DailyReport"))
 
     print("💤 bot running")
     await idle()
 
 
+# ================= SHUTDOWN =================
+async def shutdown():
+    print("\n🛑 Shutting down...")
+    try:
+        await engine.stop()
+    except:
+        pass
+    try:
+        await user.stop()
+    except:
+        pass
+    try:
+        await bot.stop()
+    except:
+        pass
+
+
 if __name__ == "__main__":
-    bot.loop.run_until_complete(main())
+    loop = bot.loop
+
+    for sig in (signal.SIGINT, signal.SIGTERM):
+        loop.add_signal_handler(sig, lambda: asyncio.create_task(shutdown()))
+
+    loop.run_until_complete(main())
     
