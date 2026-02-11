@@ -88,10 +88,12 @@ async def afk_watcher(_, message: Message):
 
     targets = {}
 
+    # ===== REPLY =====
     if message.reply_to_message and message.reply_to_message.from_user:
         u = message.reply_to_message.from_user
         targets[u.id] = u
 
+    # ===== MENTIONS =====
     if message.mentions:
         for u in message.mentions:
             targets[u.id] = u
@@ -130,4 +132,3 @@ Reason : {data.get('reason', 'Away')}
 """)
 
         await message.reply_text(f"{text}\n\n{user.mention}")
-        
