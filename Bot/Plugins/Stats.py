@@ -8,10 +8,10 @@ from Bot.Database.Chats import total_chats
 from Bot.Database.Songs import most_played
 from Bot.Database.Ranking import top_groups, top_users
 from Bot.Database.Stats import get_lifetime, sum_range
-from Bot.Database.Bans import total_banned, get_gbanned
+from Bot.Database.Bans import total_banned
+from Bot.Database.Core import db
 
 
-# ===== OWNER =====
 SUDO_USERS = [7952773964]
 
 
@@ -27,8 +27,8 @@ async def stats(_, m):
 
         banned = await total_banned()
 
-        # safer (avoid heavy in future)
-        gbanned = len(await get_gbanned())
+        # ⚡ faster than list()
+        gbanned = await db.gbanned.count_documents({})
 
         weekly_users = await sum_range(7, "users")
         monthly_users = await sum_range(30, "users")
