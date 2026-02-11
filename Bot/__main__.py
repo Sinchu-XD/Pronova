@@ -120,7 +120,7 @@ async def main():
 
     # ===== START AUTOMATION =====
     print("📊 starting daily report scheduler")
-    asyncio.create_task(safe_task(daily_gc_report(bot), "DailyReport"))
+    asyncio.create_task(safe_task(daily_gc_report(bot)))
 
     print("💤 bot running")
     await idle()
