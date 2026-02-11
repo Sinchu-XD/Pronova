@@ -1,5 +1,6 @@
 import os
 import asyncio
+import importlib
 
 from AbhiCalls import idle, Plugin
 from pyrogram import filters
@@ -16,20 +17,44 @@ from Bot.Database.Stats import inc_daily, inc_lifetime
 # ===== AUTO =====
 from Bot.Plugins.GetActivity import daily_gc_report
 
-# ===== PLUGINS =====
-import Bot.Plugins.Music
-import Bot.Plugins.Admins
-import Bot.Plugins.CallBacks
-import Bot.Plugins.Start
-import Bot.Plugins.Afk
-import Bot.Plugins.GetActivity
-import Bot.Plugins.Broadcast
-import Bot.Plugins.Stats
-import Bot.Plugins.Bans
-
 from Bot.Helper.Assistant import setup_assistant
 
 
+# ================= PLUGIN LOADER =================
+def load_plugins():
+    print("\n📦 Loading Plugins...\n")
+
+    PLUGINS = [
+        "Music",
+        "Admins",
+        "CallBacks",
+        "Start",
+        "Afk",
+        "GetActivity",
+        "Broadcast",
+        "Stats",
+        "Bans"
+    ]
+
+    loaded = []
+    failed = []
+
+    for plug in PLUGINS:
+        try:
+            importlib.import_module(f"Bot.Plugins.{plug}")
+            print(f"✅ {plug}")
+            loaded.append(plug)
+        except Exception as e:
+            print(f"❌ {plug} → {e}")
+            failed.append(plug)
+
+    print("\n==============================")
+    print(f"✅ Loaded : {len(loaded)}")
+    print(f"❌ Failed : {len(failed)}")
+    print("==============================\n")
+
+
+# ================= MAIN =================
 async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
@@ -49,8 +74,20 @@ async def main():
     print("🗄 database setup")
     await setup_database()
 
-    print("🔌 load plugin")
+    print("🔌 load vc plugin")
     engine.vc.load_plugin(Plugin(bot))
+
+    # ===== LOAD ALL PLUGINS =====
+    load_plugins()
+
+    # ===== HANDLER COUNT =====
+    print("\n📡 Handler Info")
+    total = 0
+    for group, handlers in bot.dispatcher.groups.items():
+        print(f"Group {group}: {len(handlers)} handlers")
+        total += len(handlers)
+
+    print(f"Total Handlers: {total}\n")
 
     # ===== START AUTOMATION =====
     print("📊 starting daily report scheduler")
@@ -62,7 +99,6 @@ async def main():
         try:
             if not message.from_user:
                 return
-
             if message.from_user.is_bot:
                 return
 
@@ -75,7 +111,6 @@ async def main():
                     message.from_user.id
                 )
 
-            # auto command analytics
             if message.command:
                 await inc_lifetime("commands")
                 await inc_daily("commands")
