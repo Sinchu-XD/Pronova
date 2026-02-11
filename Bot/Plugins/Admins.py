@@ -5,7 +5,7 @@ from Bot import bot, engine
 from Bot.Helper.Font import sc
 
 # ===== DB =====
-from Bot.Database.bans import is_banned, is_gbanned
+from Bot.Database.Bans import is_banned, is_gbanned
 
 
 # ───────── ADMIN CHECK ─────────
