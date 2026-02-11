@@ -60,6 +60,9 @@ async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
 
+    # ===== LOAD PLUGINS FIRST =====
+    load_plugins()
+
     print("🤖 bot start")
     await bot.start()
 
