@@ -59,6 +59,8 @@ async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
 
+    load_plugins()
+
     print("🤖 bot start")
     await bot.start()
 
@@ -78,7 +80,7 @@ async def main():
     engine.vc.load_plugin(Plugin(bot))
 
     # ===== LOAD ALL PLUGINS =====
-    load_plugins()
+    
 
     # ===== HANDLER COUNT =====
     print("\n📡 Handler Info")
