@@ -3,14 +3,13 @@ from pyrogram import filters
 from Bot import bot
 from Bot.Helper.Font import sc
 
-from Bot.Database.users import total_users
-from Bot.Database.chats import total_chats
-from Bot.Database.songs import most_played
-from Bot.Database.ranking import top_groups, top_users
-from Bot.Database.stats import get_lifetime, sum_range
-from Bot.Database.bans import total_banned
-from Bot.Database.core import db
-
+from Bot.Database.Users import total_users
+from Bot.Database.Chats import total_chats
+from Bot.Database.Songs import most_played
+from Bot.Database.Ranking import top_groups, top_users
+from Bot.Database.Stats import get_lifetime, sum_range
+from Bot.Database.Bans import total_banned
+from Bot.Database.Core import db
 
 # ===== OWNER =====
 SUDO_USERS = [7952773964]
