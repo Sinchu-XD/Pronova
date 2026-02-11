@@ -32,6 +32,7 @@ def load_plugins():
         "CallBacks",
         "Start",
         "Afk",
+        "OwnerTest",
         "GetActivity",
         "Broadcast",
         "Stats",
