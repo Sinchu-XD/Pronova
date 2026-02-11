@@ -15,7 +15,7 @@ from Bot.Database.Core import db
 SUDO_USERS = [7952773964]
 
 
-@bot.on_message(filters.command("stats") & filters.user(7952773964))
+@bot.on_message(filters.command("stats"))
 async def stats(_, m):
     msg = await m.reply(sc("fetching analytics..."))
 
