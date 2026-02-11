@@ -27,3 +27,7 @@ async def get_users():
     async for u in db.users.find({}):
         yield u["user_id"]
       
+# ================= REMOVE USER =================
+async def remove_user(user_id):
+    await db.users.delete_one({"user_id": user_id})
+    
