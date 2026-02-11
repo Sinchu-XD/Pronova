@@ -18,16 +18,22 @@ from Bot.Database.Bans import (
 
 # ================= ADMIN CHECK =================
 async def is_admin(chat_id, user_id):
-    member = await bot.get_chat_member(chat_id, user_id)
-    return member.status in (
-        ChatMemberStatus.ADMINISTRATOR,
-        ChatMemberStatus.OWNER
-    )
+    try:
+        member = await bot.get_chat_member(chat_id, user_id)
+        return member.status in (
+            ChatMemberStatus.ADMINISTRATOR,
+            ChatMemberStatus.OWNER
+        )
+    except:
+        return False
 
 
 # ================= BAN =================
-@bot.on_message(filters.command("bban") & filters.group)
+@bot.on_message(filters.command("bban"))
 async def ban(_, m):
+    if not m.from_user:
+        return
+
     if not m.reply_to_message or not m.reply_to_message.from_user:
         return await m.reply(sc("reply to user"))
 
@@ -41,8 +47,11 @@ async def ban(_, m):
 
 
 # ================= UNBAN =================
-@bot.on_message(filters.command("bunban") & filters.group)
+@bot.on_message(filters.command("bunban"))
 async def unban(_, m):
+    if not m.from_user:
+        return
+
     if not m.reply_to_message or not m.reply_to_message.from_user:
         return await m.reply(sc("reply to user"))
 
@@ -56,8 +65,14 @@ async def unban(_, m):
 
 
 # ================= GBAN =================
-@bot.on_message(filters.command("gban") & filters.user(SUDO_USERS))
+@bot.on_message(filters.command("gban"))
 async def gban(_, m):
+    if not m.from_user:
+        return
+
+    if m.from_user.id not in SUDO_USERS:
+        return await m.reply("sudo only")
+
     if not m.reply_to_message or not m.reply_to_message.from_user:
         return await m.reply(sc("reply to user"))
 
@@ -68,8 +83,14 @@ async def gban(_, m):
 
 
 # ================= UNGBAN =================
-@bot.on_message(filters.command("ungban") & filters.user(SUDO_USERS))
+@bot.on_message(filters.command("ungban"))
 async def ungban(_, m):
+    if not m.from_user:
+        return
+
+    if m.from_user.id not in SUDO_USERS:
+        return await m.reply("sudo only")
+
     if not m.reply_to_message or not m.reply_to_message.from_user:
         return await m.reply(sc("reply to user"))
 
@@ -98,8 +119,11 @@ async def checkban(_, m):
 
 
 # ================= TOTAL BANNED =================
-@bot.on_message(filters.command("totalbanned") & filters.group)
+@bot.on_message(filters.command("totalbanned"))
 async def total_banned_cmd(_, m):
+    if not m.from_user:
+        return
+
     if not await is_admin(m.chat.id, m.from_user.id):
         return await m.reply(sc("admins only"))
 
@@ -110,10 +134,15 @@ async def total_banned_cmd(_, m):
 
 
 # ================= TOTAL GBANNED =================
-@bot.on_message(filters.command("totalgbanned") & filters.user(SUDO_USERS))
+@bot.on_message(filters.command("totalgbanned"))
 async def total_gbanned_cmd(_, m):
+    if not m.from_user:
+        return
+
+    if m.from_user.id not in SUDO_USERS:
+        return await m.reply("sudo only")
+
     users = await get_gbanned()
     count = len(users)
 
     await m.reply(sc(f"total gbanned users : {count}"))
-  
