@@ -10,6 +10,8 @@ from Bot.Database.Afk import set_afk_db, get_afk, remove_afk_db
 
 # anti spam
 LAST_REPLY = {}
+SPAM_COOLDOWN = 15
+CACHE_LIMIT = 10000
 
 
 # ================= TIME FORMAT =================
@@ -63,7 +65,11 @@ async def auto_remove_afk(_, message: Message):
     if not data:
         return
 
-    since = data["since"].timestamp()
+    try:
+        since = data["since"].timestamp()
+    except Exception:
+        since = time.time()
+
     duration = format_time(time.time() - since)
 
     await remove_afk_db(user.id)
@@ -84,30 +90,43 @@ async def afk_watcher(_, message: Message):
     if not message.from_user:
         return
 
-    targets = []
+    targets = {}
 
     # reply
     if message.reply_to_message and message.reply_to_message.from_user:
-        targets.append(message.reply_to_message.from_user)
+        u = message.reply_to_message.from_user
+        targets[u.id] = u
 
     # mentions
     if message.mentions:
-        targets.extend(message.mentions)
+        for u in message.mentions:
+            targets[u.id] = u
 
-    for user in targets:
-        data = await get_afk(user.id)
+    for uid, user in targets.items():
+        if user.is_bot:
+            continue
+
+        data = await get_afk(uid)
         if not data:
             continue
 
-        key = (message.chat.id, user.id)
+        key = (message.chat.id, uid)
         last = LAST_REPLY.get(key, 0)
 
-        if time.time() - last < 15:
+        if time.time() - last < SPAM_COOLDOWN:
             continue
 
         LAST_REPLY[key] = time.time()
 
-        since = data["since"].timestamp()
+        # memory control
+        if len(LAST_REPLY) > CACHE_LIMIT:
+            LAST_REPLY.clear()
+
+        try:
+            since = data["since"].timestamp()
+        except Exception:
+            since = time.time()
+
         duration = format_time(time.time() - since)
 
         await message.reply_text(
@@ -116,7 +135,7 @@ User is AFK
 
 {user.mention}
 Last Seen : {duration}
-Reason : {data['reason']}
+Reason : {data.get('reason', 'Away')}
 """)
         )
         
