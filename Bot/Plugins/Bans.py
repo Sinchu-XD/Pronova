@@ -24,24 +24,41 @@ async def is_admin(chat_id, user_id):
             ChatMemberStatus.ADMINISTRATOR,
             ChatMemberStatus.OWNER
         )
-    except:
+    except Exception as e:
+        print("Admin check error:", e)
         return False
+
+
+# ================= SMALL DEBUG =================
+def step(x):
+    print(f"[BANS DEBUG] {x}")
 
 
 # ================= BAN =================
 @bot.on_message(filters.command("bban"))
 async def ban(_, m):
+    step("bban entered")
+
     if not m.from_user:
+        step("no from user")
         return
 
-    if not m.reply_to_message or not m.reply_to_message.from_user:
+    if not m.reply_to_message:
+        step("no reply")
         return await m.reply(sc("reply to user"))
 
+    if not m.reply_to_message.from_user:
+        step("reply but invalid")
+        return await m.reply(sc("invalid user"))
+
     if not await is_admin(m.chat.id, m.from_user.id):
+        step("not admin")
         return await m.reply(sc("admins only"))
 
     user = m.reply_to_message.from_user
+
     await ban_user(m.chat.id, user.id)
+    step("ban done")
 
     await m.reply(sc(f"user banned from using bot\n\n{user.mention}"))
 
@@ -49,6 +66,8 @@ async def ban(_, m):
 # ================= UNBAN =================
 @bot.on_message(filters.command("bunban"))
 async def unban(_, m):
+    step("bunban entered")
+
     if not m.from_user:
         return
 
@@ -61,30 +80,43 @@ async def unban(_, m):
     user = m.reply_to_message.from_user
     await unban_user(m.chat.id, user.id)
 
+    step("unban done")
     await m.reply(sc(f"user unbanned\n\n{user.mention}"))
 
 
 # ================= GBAN =================
 @bot.on_message(filters.command("gban"))
 async def gban(_, m):
+    step("gban entered")
+
     if not m.from_user:
+        step("no from user")
         return
 
     if m.from_user.id not in SUDO_USERS:
+        step("not sudo")
         return await m.reply("sudo only")
 
-    if not m.reply_to_message or not m.reply_to_message.from_user:
+    if not m.reply_to_message:
+        step("no reply")
         return await m.reply(sc("reply to user"))
+
+    if not m.reply_to_message.from_user:
+        step("invalid reply")
+        return await m.reply(sc("invalid user"))
 
     user = m.reply_to_message.from_user
     await gban_user(user.id)
 
+    step("gban done")
     await m.reply(sc(f"user globally banned\n\n{user.mention}"))
 
 
 # ================= UNGBAN =================
 @bot.on_message(filters.command("ungban"))
 async def ungban(_, m):
+    step("ungban entered")
+
     if not m.from_user:
         return
 
@@ -97,12 +129,15 @@ async def ungban(_, m):
     user = m.reply_to_message.from_user
     await ungban_user(user.id)
 
+    step("ungban done")
     await m.reply(sc(f"user globally unbanned\n\n{user.mention}"))
 
 
 # ================= CHECK =================
 @bot.on_message(filters.command("checkban"))
 async def checkban(_, m):
+    step("checkban entered")
+
     if not m.reply_to_message or not m.reply_to_message.from_user:
         return await m.reply(sc("reply to user"))
 
@@ -121,6 +156,8 @@ async def checkban(_, m):
 # ================= TOTAL BANNED =================
 @bot.on_message(filters.command("totalbanned"))
 async def total_banned_cmd(_, m):
+    step("totalbanned entered")
+
     if not m.from_user:
         return
 
@@ -136,6 +173,8 @@ async def total_banned_cmd(_, m):
 # ================= TOTAL GBANNED =================
 @bot.on_message(filters.command("totalgbanned"))
 async def total_gbanned_cmd(_, m):
+    step("totalgbanned entered")
+
     if not m.from_user:
         return
 
@@ -146,3 +185,4 @@ async def total_gbanned_cmd(_, m):
     count = len(users)
 
     await m.reply(sc(f"total gbanned users : {count}"))
+    
