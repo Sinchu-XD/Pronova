@@ -25,6 +25,7 @@ import Bot.Plugins.Afk
 import Bot.Plugins.GetActivity
 import Bot.Plugins.Broadcast
 import Bot.Plugins.Stats
+import Bot.Plugins.Bans
 
 from Bot.Helper.Assistant import setup_assistant
 
