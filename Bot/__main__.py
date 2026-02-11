@@ -1,15 +1,22 @@
 import os
 import asyncio
+
 from AbhiCalls import idle, Plugin
 from pyrogram import filters
 
 from Bot import bot, user, engine
-from Bot.Database.core import setup_database
-from Bot.Database.users import add_user
-from Bot.Database.chats import add_chat
-from Bot.Database.activity import update_gc_activity
-from Bot.Database.stats import inc_daily, inc_lifetime
 
+# ===== DATABASE =====
+from Bot.Database.Core import setup_database
+from Bot.Database.Users import add_user
+from Bot.Database.Chats import add_chat
+from Bot.Database.Activity import update_gc_activity
+from Bot.Database.Stats import inc_daily, inc_lifetime
+
+# ===== AUTO =====
+from Bot.Plugins.GetActivity import daily_gc_report
+
+# ===== PLUGINS =====
 import Bot.Plugins.Music
 import Bot.Plugins.Admins
 import Bot.Plugins.CallBacks
@@ -44,30 +51,30 @@ async def main():
     print("🔌 load plugin")
     engine.vc.load_plugin(Plugin(bot))
 
+    # ===== START AUTOMATION =====
+    print("📊 starting daily report scheduler")
+    asyncio.create_task(daily_gc_report(bot))
+
     # ========= GLOBAL TRACKER =========
     @bot.on_message(filters.private | filters.group)
     async def register(_, message):
         try:
-            # skip anonymous / service / empty
             if not message.from_user:
                 return
 
-            # skip bots
             if message.from_user.is_bot:
                 return
 
-            # save user & chat
             await add_user(message.from_user)
             await add_chat(message.chat.id)
 
-            # group activity
             if message.chat.type != "private":
                 await update_gc_activity(
                     message.chat.id,
                     message.from_user.id
                 )
 
-            # command auto count
+            # auto command analytics
             if message.command:
                 await inc_lifetime("commands")
                 await inc_daily("commands")
@@ -75,9 +82,10 @@ async def main():
         except Exception as e:
             print("Register Error:", e)
 
-    print("💤 idle")
+    print("💤 bot running")
     await idle()
 
 
 if __name__ == "__main__":
     bot.loop.run_until_complete(main())
+    
