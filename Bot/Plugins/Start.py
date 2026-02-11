@@ -9,98 +9,81 @@ BOT_NAME = "𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 𝑩𝒐𝒕🌷"
 MUSIC_STICKER = "CAACAgUAAx0CZzxBYgABB2zoaYjxDe3E6k4Spe_lmG-wfKUjdrYAAm8VAAKaqulXWtKxQoF0Y_UeBA"
 
 
-# ==========================
-# SMART SAFE EDIT
-# ==========================
-_last_text_cache = {}
-CACHE_LIMIT = 200  # prevent memory leak
+# prevent duplicate animations
+RUNNING = set()
 
 
+# ================= SAFE EDIT =================
 async def safe_edit(msg: Message, text: str, **kwargs):
-    key = (msg.chat.id, msg.id)
-
-    if _last_text_cache.get(key) == text:
-        return
-
     try:
         await msg.edit_text(text, **kwargs)
-        _last_text_cache[key] = text
-
-        # cleanup
-        if len(_last_text_cache) > CACHE_LIMIT:
-            _last_text_cache.clear()
-
     except Exception as e:
         if "MESSAGE_NOT_MODIFIED" in str(e):
             return
         print("[StartUI Edit]", e)
 
 
-# ==========================
-# ULTIMATE ANIMATION
-# ==========================
+# ================= ANIMATION =================
 async def pronova_ultimate_animation(message: Message, user_name: str):
-    print("[StartUI] animation start")
+    key = (message.chat.id, message.id)
 
-    # Phase 1
-    boot_phases = [
-        "🌐 ᴄᴏɴɴᴇᴄᴛɪɴɢ ᴛᴏ ᴘʀᴏɴᴏᴠᴀ ɴᴇᴛᴡᴏʀᴋ...",
-        "⚙️ ʟᴏᴀᴅɪɴɢ ᴀᴜᴅɪᴏ ᴅʀɪᴠᴇʀs [ᴠ8.2]...",
-        "🛡️ sᴇᴄᴜʀɪɴɢ sᴇssɪᴏɴ...",
-        "✅ sʏsᴛᴇᴍ ʀᴇᴀᴅʏ."
-    ]
+    if key in RUNNING:
+        return
 
-    for phase in boot_phases:
-        await safe_edit(message, f"<code>{phase}</code>")
-        await asyncio.sleep(0.5)
+    RUNNING.add(key)
 
-    header = f"🎼 **{BOT_NAME}**\n"
-    line = "⎯" * 30 + "\n"
+    try:
+        boot_phases = [
+            "🌐 ᴄᴏɴɴᴇᴄᴛɪɴɢ ᴛᴏ ᴘʀᴏɴᴏᴠᴀ ɴᴇᴛᴡᴏʀᴋ...",
+            "⚙️ ʟᴏᴀᴅɪɴɢ ᴀᴜᴅɪᴏ ᴅʀɪᴠᴇʀs...",
+            "🛡️ sᴇᴄᴜʀɪɴɢ sᴇssɪᴏɴ...",
+            "✅ sʏsᴛᴇᴍ ʀᴇᴀᴅʏ."
+        ]
 
-    welcome_text = (
-        f"ʜᴇʟʟᴏ {user_name}, ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ɴᴇxᴛ ᴇʀᴀ ᴏꜰ ᴍᴜsɪᴄ."
-    )
+        for phase in boot_phases:
+            await safe_edit(message, f"<code>{phase}</code>")
+            await asyncio.sleep(0.5)
 
-    words = welcome_text.split()
-    current = ""
+        header = f"🎼 **{BOT_NAME}**\n"
+        line = "⎯" * 30 + "\n"
 
-    for word in words:
-        current += word + " "
-        await safe_edit(message, f"{header}{line}*“ {current}▎ ”*\n{line}")
-        await asyncio.sleep(0.12)
+        welcome_text = f"ʜᴇʟʟᴏ {user_name}, ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ɴᴇxᴛ ᴇʀᴀ ᴏꜰ ᴍᴜsɪᴄ."
+        words = welcome_text.split()
 
-    # Final dashboard
-    dashboard = (
-        f"🎼 **{BOT_NAME}**\n"
-        f"{line}"
-        "●─────────── 𝟶𝟻:𝟸𝟶\n"
-        "⇆   ◁   ❚❚   ▷   ↻\n"
-        f"{line}"
-        "👤 **ᴜsᴇʀ:** `ᴘʀᴇᴍɪᴜᴍ`\n"
-        "🔊 **ǫᴜᴀʟɪᴛʏ:** `𝟸𝟺-ʙɪᴛ`\n"
-        "📶 **ʟᴀᴛᴇɴᴄʏ:** `ᴜʟᴛʀᴀ ʟᴏᴡ`\n"
-        f"{line}"
-        "✨ **ᴛᴀᴘ ʙᴇʟᴏᴡ ᴛᴏ sᴛᴀʀᴛ**"
-    )
+        current = ""
+        for word in words:
+            current += word + " "
+            await safe_edit(message, f"{header}{line}*“ {current}▎ ”*\n{line}")
+            await asyncio.sleep(0.12)
 
-    buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("ᴀᴅᴅ 𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 ᴛᴏ ɢʀᴏᴜᴘ", url="https://t.me/ProNovaMusicBot?startgroup=true")],
-        [InlineKeyboardButton("ᴊᴏɪɴ ᴠɪᴘ ᴄʜᴀɴɴᴇʟ", url="https://t.me/Her4Eva")],
-        [InlineKeyboardButton("👑 ʙᴏᴛ ᴏᴡɴᴇʀ", url="https://t.me/WtfShia")]
-    ])
+        dashboard = (
+            f"🎼 **{BOT_NAME}**\n"
+            f"{line}"
+            "●─────────── 𝟶𝟻:𝟸𝟶\n"
+            "⇆   ◁   ❚❚   ▷   ↻\n"
+            f"{line}"
+            "👤 **ᴜsᴇʀ:** `ᴘʀᴇᴍɪᴜᴍ`\n"
+            "🔊 **ǫᴜᴀʟɪᴛʏ:** `𝟸𝟺-ʙɪᴛ`\n"
+            "📶 **ʟᴀᴛᴇɴᴄʏ:** `ᴜʟᴛʀᴀ ʟᴏᴡ`\n"
+            f"{line}"
+            "✨ **ᴛᴀᴘ ʙᴇʟᴏᴡ ᴛᴏ sᴛᴀʀᴛ**"
+        )
 
-    await safe_edit(message, dashboard, reply_markup=buttons)
+        buttons = InlineKeyboardMarkup([
+            [InlineKeyboardButton("ᴀᴅᴅ 𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 ᴛᴏ ɢʀᴏᴜᴘ", url="https://t.me/ProNovaMusicBot?startgroup=true")],
+            [InlineKeyboardButton("ᴊᴏɪɴ ᴠɪᴘ ᴄʜᴀɴɴᴇʟ", url="https://t.me/Her4Eva")],
+            [InlineKeyboardButton("👑 ʙᴏᴛ ᴏᴡɴᴇʀ", url="https://t.me/WtfShia")]
+        ])
 
-    print("[StartUI] animation end")
+        await safe_edit(message, dashboard, reply_markup=buttons)
+
+    finally:
+        RUNNING.discard(key)
 
 
-# ==========================
-# START
-# ==========================
+# ================= START =================
 @bot.on_message(filters.command("start") & filters.private)
-async def start_handler(client, message: Message):
-    print("[StartUI] /start")
-
+async def start_handler(_, message: Message):
     if not message.from_user:
         return
 
