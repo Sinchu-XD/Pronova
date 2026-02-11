@@ -1,6 +1,7 @@
 import os
 import asyncio
 import importlib
+import traceback
 
 from AbhiCalls import idle, Plugin
 from pyrogram import filters
@@ -27,7 +28,7 @@ def load_plugins():
     PLUGINS = [
         "Music",
         "Admins",
-        "CallBacks",
+        "Callbacks",  # FIXED
         "Start",
         "Afk",
         "GetActivity",
@@ -44,8 +45,9 @@ def load_plugins():
             importlib.import_module(f"Bot.Plugins.{plug}")
             print(f"✅ {plug}")
             loaded.append(plug)
-        except Exception as e:
-            print(f"❌ {plug} → {e}")
+        except Exception:
+            print(f"❌ {plug}")
+            traceback.print_exc()
             failed.append(plug)
 
     print("\n==============================")
@@ -59,8 +61,7 @@ async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
 
-    load_plugins()
-
+    # ===== START CORE FIRST =====
     print("🤖 bot start")
     await bot.start()
 
@@ -79,8 +80,8 @@ async def main():
     print("🔌 load vc plugin")
     engine.vc.load_plugin(Plugin(bot))
 
-    # ===== LOAD ALL PLUGINS =====
-    
+    # ===== NOW LOAD PLUGINS =====
+    load_plugins()
 
     # ===== HANDLER COUNT =====
     print("\n📡 Handler Info")
@@ -88,15 +89,14 @@ async def main():
     for group, handlers in bot.dispatcher.groups.items():
         print(f"Group {group}: {len(handlers)} handlers")
         total += len(handlers)
-
     print(f"Total Handlers: {total}\n")
 
     # ===== START AUTOMATION =====
     print("📊 starting daily report scheduler")
     asyncio.create_task(daily_gc_report(bot))
 
+
     # ========= GLOBAL TRACKER =========
-    """
     @bot.on_message(filters.private | filters.group)
     async def register(_, message):
         try:
@@ -120,12 +120,11 @@ async def main():
 
         except Exception as e:
             print("Register Error:", e)
-"""
+
+
     @bot.on_message(filters.command("test"))
     async def test_cmd(_, m):
-        print("TEST COMMAND ARRIVED")
         await m.reply("I AM ALIVE")
-    
 
     print("💤 bot running")
     await idle()
