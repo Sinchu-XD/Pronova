@@ -18,3 +18,7 @@ async def add_chat(chat_id):
 async def total_chats():
     return await db.chats.count_documents({})
   
+async def get_all_chats():
+    async for c in db.chats.find({}):
+        yield c["chat_id"]
+        
