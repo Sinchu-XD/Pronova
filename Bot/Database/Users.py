@@ -1,7 +1,7 @@
 from datetime import datetime
 from pymongo.errors import DuplicateKeyError
-from .core import db
-from .stats import inc_lifetime, inc_daily
+from .Core import db
+from .Stats import inc_lifetime, inc_daily
 
 
 async def add_user(user):
