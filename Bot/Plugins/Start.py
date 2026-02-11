@@ -1,6 +1,7 @@
 import asyncio
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+
 from Bot import bot
 
 
@@ -12,15 +13,10 @@ MUSIC_STICKER = "CAACAgUAAx0CZzxBYgABB2zoaYjxDe3E6k4Spe_lmG-wfKUjdrYAAm8VAAKaqul
 # SMART SAFE EDIT
 # ==========================
 _last_text_cache = {}
+CACHE_LIMIT = 200  # prevent memory leak
 
 
 async def safe_edit(msg: Message, text: str, **kwargs):
-    """
-    Smart edit:
-    - skip same text
-    - flood safe
-    - deleted message safe
-    """
     key = (msg.chat.id, msg.id)
 
     if _last_text_cache.get(key) == text:
@@ -30,10 +26,14 @@ async def safe_edit(msg: Message, text: str, **kwargs):
         await msg.edit_text(text, **kwargs)
         _last_text_cache[key] = text
 
+        # cleanup
+        if len(_last_text_cache) > CACHE_LIMIT:
+            _last_text_cache.clear()
+
     except Exception as e:
         if "MESSAGE_NOT_MODIFIED" in str(e):
             return
-        print("[StartUI:Edit]", e)
+        print("[StartUI Edit]", e)
 
 
 # ==========================
@@ -46,21 +46,19 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
     boot_phases = [
         "🌐 ᴄᴏɴɴᴇᴄᴛɪɴɢ ᴛᴏ ᴘʀᴏɴᴏᴠᴀ ɴᴇᴛᴡᴏʀᴋ...",
         "⚙️ ʟᴏᴀᴅɪɴɢ ᴀᴜᴅɪᴏ ᴅʀɪᴠᴇʀs [ᴠ8.2]...",
-        "🛡️ sᴇᴄᴜʀɪɴɢ sᴇssɪᴏɴ ᴇɴᴅ-ᴛᴏ-ᴇɴᴅ...",
-        "✅ sʏsᴛᴇᴍ ʀᴇᴀᴅʏ. ᴡᴇʟᴄᴏᴍᴇ ʙᴀᴄᴋ."
+        "🛡️ sᴇᴄᴜʀɪɴɢ sᴇssɪᴏɴ...",
+        "✅ sʏsᴛᴇᴍ ʀᴇᴀᴅʏ."
     ]
 
     for phase in boot_phases:
         await safe_edit(message, f"<code>{phase}</code>")
         await asyncio.sleep(0.5)
 
-    # Phase 2
     header = f"🎼 **{BOT_NAME}**\n"
     line = "⎯" * 30 + "\n"
 
     welcome_text = (
-        f"ʜᴇʟʟᴏ {user_name}, ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ɴᴇxᴛ ᴇʀᴀ ᴏꜰ ᴍᴜsɪᴄ ᴅᴇʟɪᴠᴇʀʏ. "
-        "ᴇxᴘᴇʀɪᴇɴᴄᴇ ᴛʜᴇ ᴅᴇᴘᴛʜ ᴏꜰ sᴏᴜɴᴅ."
+        f"ʜᴇʟʟᴏ {user_name}, ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ɴᴇxᴛ ᴇʀᴀ ᴏꜰ ᴍᴜsɪᴄ."
     )
 
     words = welcome_text.split()
@@ -71,12 +69,12 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
         await safe_edit(message, f"{header}{line}*“ {current}▎ ”*\n{line}")
         await asyncio.sleep(0.12)
 
-    # Final
+    # Final dashboard
     dashboard = (
         f"🎼 **{BOT_NAME}**\n"
         f"{line}"
         "●─────────── 𝟶𝟻:𝟸𝟶\n"
-        "⇆   ㅤ◁   ㅤ❚❚   ㅤ▷   ㅤ↻\n"
+        "⇆   ◁   ❚❚   ▷   ↻\n"
         f"{line}"
         "👤 **ᴜsᴇʀ:** `ᴘʀᴇᴍɪᴜᴍ`\n"
         "🔊 **ǫᴜᴀʟɪᴛʏ:** `𝟸𝟺-ʙɪᴛ`\n"
@@ -86,9 +84,9 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
     )
 
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton(" ᴀᴅᴅ 𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 ᴛᴏ ɢʀᴏᴜᴘ ", url="https://t.me/ProNovaMusicBot?startgroup=true")],
-        [InlineKeyboardButton(" ᴊᴏɪɴ ᴠɪᴘ ᴄʜᴀɴɴᴇʟ", url="https://t.me/Her4Eva")],
-        [InlineKeyboardButton(" 👑 ʙᴏᴛ ᴏᴡɴᴇʀ ", url="https://t.me/WtfShia")]
+        [InlineKeyboardButton("ᴀᴅᴅ 𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 ᴛᴏ ɢʀᴏᴜᴘ", url="https://t.me/ProNovaMusicBot?startgroup=true")],
+        [InlineKeyboardButton("ᴊᴏɪɴ ᴠɪᴘ ᴄʜᴀɴɴᴇʟ", url="https://t.me/Her4Eva")],
+        [InlineKeyboardButton("👑 ʙᴏᴛ ᴏᴡɴᴇʀ", url="https://t.me/WtfShia")]
     ])
 
     await safe_edit(message, dashboard, reply_markup=buttons)
@@ -103,12 +101,15 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
 async def start_handler(client, message: Message):
     print("[StartUI] /start")
 
+    if not message.from_user:
+        return
+
     user_name = message.from_user.mention
 
     try:
         await message.reply_sticker(MUSIC_STICKER)
     except Exception as e:
-        print("[StartUI:Sticker]", e)
+        print("[StartUI Sticker]", e)
 
     try:
         status_msg = await message.reply_text(
@@ -116,7 +117,8 @@ async def start_handler(client, message: Message):
             quote=True
         )
     except Exception as e:
-        print("[StartUI:InitMsg]", e)
+        print("[StartUI Init]", e)
         return
 
     await pronova_ultimate_animation(status_msg, user_name)
+    
