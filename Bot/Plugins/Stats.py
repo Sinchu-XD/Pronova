@@ -3,19 +3,20 @@ from pyrogram import filters
 from Bot import bot
 from Bot.Helper.Font import sc
 
-from Bot.Database.Users import total_users
-from Bot.Database.Chats import total_chats
-from Bot.Database.Songs import most_played
-from Bot.Database.Ranking import top_groups, top_users
-from Bot.Database.Stats import get_lifetime, sum_range
-from Bot.Database.Bans import total_banned
-from Bot.Database.Core import db
+from Bot.Database.users import total_users
+from Bot.Database.chats import total_chats
+from Bot.Database.songs import most_played
+from Bot.Database.ranking import top_groups, top_users
+from Bot.Database.stats import get_lifetime, sum_range
+from Bot.Database.bans import total_banned
+from Bot.Database.core import db
 
 
+# ===== OWNER =====
 SUDO_USERS = [7952773964]
 
 
-@bot.on_message(filters.command("stats"))
+@bot.on_message(filters.command("stats") & filters.user(SUDO_USERS))
 async def stats(_, m):
     msg = await m.reply(sc("fetching analytics..."))
 
@@ -26,8 +27,6 @@ async def stats(_, m):
         commands = await get_lifetime("commands")
 
         banned = await total_banned()
-
-        # ⚡ faster than list()
         gbanned = await db.gbanned.count_documents({})
 
         weekly_users = await sum_range(7, "users")
@@ -59,9 +58,16 @@ Growth
 Top Groups
 """
 
+    # ================= GROUP NAMES =================
     if tg:
         for i, (cid, s) in enumerate(tg, 1):
-            text += f"{i}. {cid} → {s}\n"
+            try:
+                chat = await bot.get_chat(int(cid))
+                name = chat.title
+            except:
+                name = cid
+
+            text += f"{i}. {name} → {s}\n"
     else:
         text += "No data\n"
 
