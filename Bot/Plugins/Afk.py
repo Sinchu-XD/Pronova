@@ -4,11 +4,9 @@ from pyrogram.types import Message
 
 from Bot import bot
 from Bot.Helper.Font import sc
-
 from Bot.Database.Afk import set_afk_db, get_afk, remove_afk_db
 
 
-# anti spam
 LAST_REPLY = {}
 SPAM_COOLDOWN = 15
 CACHE_LIMIT = 10000
@@ -32,7 +30,7 @@ def format_time(seconds: int):
 # ================= SET AFK =================
 @bot.on_message(filters.command("afk"))
 async def set_afk(_, message: Message):
-    user = message.from_user.mention
+    user = message.from_user
     if not user:
         return
 
@@ -42,22 +40,21 @@ async def set_afk(_, message: Message):
 
     await set_afk_db(user.id, reason)
 
-    await message.reply_text(
-        sc(f"""
+    text = sc(f"""
 AFK Enabled
 
-{user}
 Reason : {reason}
 
 I will inform anyone who mentions you.
 """)
-    )
+
+    await message.reply_text(f"{text}\n\n{user.mention}")
 
 
 # ================= AUTO REMOVE =================
 @bot.on_message(filters.all & ~filters.command("afk"))
 async def auto_remove_afk(_, message: Message):
-    user = message.from_user.mention
+    user = message.from_user
     if not user:
         return
 
@@ -74,14 +71,13 @@ async def auto_remove_afk(_, message: Message):
 
     await remove_afk_db(user.id)
 
-    await message.reply_text(
-        sc(f"""
+    text = sc(f"""
 Welcome Back
 
-{user}
 Away for : {duration}
 """)
-    )
+
+    await message.reply_text(f"{text}\n\n{user.mention}")
 
 
 # ================= WATCH =================
@@ -92,12 +88,10 @@ async def afk_watcher(_, message: Message):
 
     targets = {}
 
-    # reply
     if message.reply_to_message and message.reply_to_message.from_user:
         u = message.reply_to_message.from_user
         targets[u.id] = u
 
-    # mentions
     if message.mentions:
         for u in message.mentions:
             targets[u.id] = u
@@ -118,7 +112,6 @@ async def afk_watcher(_, message: Message):
 
         LAST_REPLY[key] = time.time()
 
-        # memory control
         if len(LAST_REPLY) > CACHE_LIMIT:
             LAST_REPLY.clear()
 
@@ -129,13 +122,12 @@ async def afk_watcher(_, message: Message):
 
         duration = format_time(time.time() - since)
 
-        await message.reply_text(
-            sc(f"""
+        text = sc(f"""
 User is AFK
 
-{user.mention}
 Last Seen : {duration}
 Reason : {data.get('reason', 'Away')}
 """)
-        )
+
+        await message.reply_text(f"{text}\n\n{user.mention}")
         
