@@ -1,34 +1,40 @@
 from datetime import datetime
-from pymongo.errors import DuplicateKeyError
 from .Core import db
 
 
-# set afk
+# ================= SET =================
 async def set_afk_db(user_id, reason):
-    try:
-        await db.afk.insert_one({
-            "user_id": user_id,
-            "reason": reason,
-            "since": datetime.utcnow()
-        })
-    except DuplicateKeyError:
-        await db.afk.update_one(
-            {"user_id": user_id},
-            {
-                "$set": {
-                    "reason": reason,
-                    "since": datetime.utcnow()
-                }
+    if not user_id:
+        return
+
+    uid = int(user_id)
+
+    await db.afk.update_one(
+        {"user_id": uid},
+        {
+            "$set": {
+                "reason": reason,
+                "since": datetime.utcnow()
             }
-        )
+        },
+        upsert=True,
+    )
 
 
-# remove
+# ================= REMOVE =================
 async def remove_afk_db(user_id):
-    await db.afk.delete_one({"user_id": user_id})
+    if not user_id:
+        return
+
+    await db.afk.delete_one({"user_id": int(user_id)})
 
 
-# get
+# ================= GET =================
 async def get_afk(user_id):
-    return await db.afk.find_one({"user_id": user_id})
-  
+    if not user_id:
+        return None
+
+    return await db.afk.find_one(
+        {"user_id": int(user_id)},
+        {"reason": 1, "since": 1}
+    )
