@@ -13,8 +13,6 @@ from Bot.Database.Core import db
 
 SUDO_USERS = [7952773964]
 
-
-# speed control (safe)
 DELAY = 0.25
 
 
@@ -62,12 +60,11 @@ async def broadcast(_, message):
             print("Broadcast Error:", user_id, e)
             failed += 1
 
-        # progress every 200
+        # ===== PROGRESS =====
         if total % 200 == 0:
             try:
-                await status.edit(
-                    sc(f"broadcasting...\n\nprocessed : {total}")
-                )
+                txt = sc(f"broadcasting...\n\nprocessed : {total}")
+                await status.edit(txt)
             except:
                 pass
 
@@ -86,8 +83,7 @@ async def broadcast(_, message):
 
     taken = round(time.time() - start_time, 2)
 
-    await status.edit(
-        sc(f"""
+    final = sc(f"""
 broadcast completed
 
 total users : {total}
@@ -96,5 +92,6 @@ failed : {failed}
 
 time taken : {taken}s
 """)
-    )
+
+    await status.edit(final)
     
