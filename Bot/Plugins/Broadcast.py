@@ -14,6 +14,10 @@ from Bot.Database.Core import db
 SUDO_USERS = [7952773964]
 
 
+# speed control (safe)
+DELAY = 0.25
+
+
 @bot.on_message(filters.command("broadcast") & filters.user(SUDO_USERS))
 async def broadcast(_, message):
     if not message.reply_to_message:
@@ -34,10 +38,12 @@ async def broadcast(_, message):
         try:
             await msg.copy(user_id)
             success += 1
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(DELAY)
 
         except FloodWait as e:
-            await asyncio.sleep(e.value)
+            print(f"FloodWait {e.value}s")
+            await asyncio.sleep(e.value + 1)
+
             try:
                 await msg.copy(user_id)
                 success += 1
@@ -56,20 +62,25 @@ async def broadcast(_, message):
             print("Broadcast Error:", user_id, e)
             failed += 1
 
-        # progress update every 100 users
-        if total % 100 == 0:
+        # progress every 200
+        if total % 200 == 0:
             try:
-                await status.edit(sc(f"broadcasting...\n\ndone : {total}"))
+                await status.edit(
+                    sc(f"broadcasting...\n\nprocessed : {total}")
+                )
             except:
                 pass
 
-    # ===== save log =====
-    await db.broadcasts.insert_one({
-        "total": total,
-        "success": success,
-        "failed": failed,
-        "time": int(time.time())
-    })
+    # ===== LOG =====
+    try:
+        await db.broadcasts.insert_one({
+            "total": total,
+            "success": success,
+            "failed": failed,
+            "time": int(time.time())
+        })
+    except Exception as e:
+        print("Log Error:", e)
 
     await inc_lifetime("broadcasts")
 
