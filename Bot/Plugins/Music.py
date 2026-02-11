@@ -5,8 +5,10 @@ from Bot import bot, engine
 from Bot.Helper.Assistant import get_ass
 from Bot.Helper.Font import sc
 
-from Bot.Database.Songs import inc_song_play
-from Bot.Database.Bans import is_banned, is_gbanned
+from Bot.Database.songs import inc_song_play
+from Bot.Database.bans import is_banned, is_gbanned
+from Bot.Database.users import add_user
+from Bot.Database.chats import add_chat
 
 
 # ================= ADMIN CHECK =================
@@ -56,21 +58,24 @@ async def handle_play(m, force=False):
     if not m.from_user:
         return
 
-    if force and not await is_admin(m.chat.id, m.from_user.id):
+    uid = m.from_user.id
+    chat_id = m.chat.id
+
+    if force and not await is_admin(chat_id, uid):
         return await m.reply(sc("admins only"))
 
-    if not await get_ass(m.chat.id, m):
+    if not await get_ass(chat_id, m):
         return
 
     if force:
         try:
-            await engine.vc.stop(m.chat.id)
+            await engine.vc.stop(chat_id)
         except Exception as e:
             print("VC Stop Error:", e)
 
     reply = m.reply_to_message
 
-    # ===== AUDIO =====
+    # ================= AUDIO =================
     if reply and (reply.voice or reply.audio):
         try:
             path = await reply.download()
@@ -80,7 +85,7 @@ async def handle_play(m, force=False):
 
         try:
             song, title = await engine.vc.play_file(
-                m.chat.id,
+                chat_id,
                 path,
                 m.from_user.mention,
                 reply=reply
@@ -92,10 +97,13 @@ async def handle_play(m, force=False):
         if not song:
             return await m.reply(sc("unable to play audio"))
 
-        await inc_song_play(m.chat.id, title or "telegram audio")
+        # ===== SAVE STATS =====
+        await inc_song_play(chat_id, title or "telegram audio")
+        await add_user(m.from_user)
+        await add_chat(chat_id)
         return
 
-    # ===== QUERY =====
+    # ================= QUERY =================
     if len(m.command) < 2:
         return await m.reply(sc("give song name"))
 
@@ -103,7 +111,7 @@ async def handle_play(m, force=False):
 
     try:
         song, title = await engine.vc.play(
-            m.chat.id,
+            chat_id,
             query,
             m.from_user.mention
         )
@@ -114,7 +122,10 @@ async def handle_play(m, force=False):
     if not song:
         return await m.reply(sc("unable to play song"))
 
-    await inc_song_play(m.chat.id, title or query)
+    # ===== SAVE STATS =====
+    await inc_song_play(chat_id, title or query)
+    await add_user(m.from_user)
+    await add_chat(chat_id)
 
 
 # ================= PLAY =================
@@ -129,4 +140,4 @@ async def play(_, m):
 async def playforce(_, m):
     await safe_delete(m)
     await handle_play(m, force=True)
-                                
+    
