@@ -26,7 +26,7 @@ async def is_admin(chat_id, user_id):
 
 
 # ================= BAN =================
-@bot.on_message(filters.command("ban") & filters.group)
+@bot.on_message(filters.command("bban") & filters.group)
 async def ban(_, m):
     if not m.reply_to_message or not m.reply_to_message.from_user:
         return await m.reply(sc("reply to user"))
@@ -41,7 +41,7 @@ async def ban(_, m):
 
 
 # ================= UNBAN =================
-@bot.on_message(filters.command("unban") & filters.group)
+@bot.on_message(filters.command("bunban") & filters.group)
 async def unban(_, m):
     if not m.reply_to_message or not m.reply_to_message.from_user:
         return await m.reply(sc("reply to user"))
