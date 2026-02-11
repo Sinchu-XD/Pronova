@@ -6,8 +6,8 @@ from Bot.Helper.Assistant import get_ass
 from Bot.Helper.Font import sc
 
 # ===== DB =====
-from Bot.Database.songs import inc_song_play
-from Bot.Database.bans import is_banned, is_gbanned
+from Bot.Database.Songs import inc_song_play
+from Bot.Database.Bans import is_banned, is_gbanned
 
 
 # ───────── ADMIN CHECK ─────────
