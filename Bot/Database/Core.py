@@ -16,4 +16,4 @@ async def setup_database():
     await db.gbanned.create_index("user_id", unique=True)
     await db.daily.create_index("date", unique=True)
     await db.gc_activity.create_index("chat_id", unique=True)
-  
+    await db.afk.create_index("user_id", unique=True)
