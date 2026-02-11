@@ -3,15 +3,15 @@ from pyrogram import filters
 from Bot import bot
 from Bot.Helper.Font import sc
 
-from Bot.Database.Users import total_users
-from Bot.Database.Chats import total_chats
-from Bot.Database.Songs import most_played
-from Bot.Database.Ranking import top_groups, top_users
-from Bot.Database.Stats import get_lifetime, sum_range
-from Bot.Database.Bans import total_banned
+from Bot.Database.users import total_users
+from Bot.Database.chats import total_chats
+from Bot.Database.songs import most_played
+from Bot.Database.ranking import top_groups, top_users
+from Bot.Database.stats import get_lifetime, sum_range
+from Bot.Database.bans import total_banned, get_gbanned
 
 
-# put your ID
+# ===== OWNER =====
 SUDO_USERS = [7952773964]
 
 
@@ -23,7 +23,9 @@ async def stats(_, m):
     chats = await total_chats()
     songs = await get_lifetime("songs")
     commands = await get_lifetime("commands")
+
     banned = await total_banned()
+    gbanned = len(await get_gbanned())
 
     weekly_users = await sum_range(7, "users")
     monthly_users = await sum_range(30, "users")
@@ -39,7 +41,9 @@ Users : {users}
 Chats : {chats}
 Songs : {songs}
 Commands : {commands}
-Banned : {banned}
+
+Banned (groups) : {banned}
+Gbanned (global) : {gbanned}
 
 Growth
 7 Days : {weekly_users}
@@ -71,3 +75,4 @@ Top Groups
         text += "No data\n"
 
     await msg.edit(sc(text))
+    
