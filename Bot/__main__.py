@@ -3,6 +3,13 @@ import asyncio
 from AbhiCalls import idle, Plugin
 
 from Bot import bot, user, engine
+from Bot.Database.core import setup_database
+from Bot.Database.users import add_user
+from Bot.Database.chats import add_chat
+from Bot.Database.activity import update_gc_activity
+from Bot.Database.stats import inc_daily
+from Bot.Database.ranking import *
+from Bot.Database.songs import *
 
 import Bot.Plugins.Music
 import Bot.Plugins.Admins
@@ -29,12 +36,26 @@ async def main():
     print("⚙️ setup assistant")
     await setup_assistant()
 
+    print("🗄 database setup")
+    await setup_database()
+
     print("🔌 load plugin")
     engine.vc.load_plugin(Plugin(bot))
 
+    # ========= AUTO REGISTER =========
+    @bot.on_message(filters.private | filters.group)
+    async def register(_, message):
+        await add_user(message.from_user)
+        await add_chat(message.chat.id)
+
+        if message.chat.type != "private" and message.from_user:
+            await update_gc_activity(
+                message.chat.id,
+                message.from_user.id
+            )
+
     print("💤 idle")
     await idle()
-
 
 if __name__ == "__main__":
     bot.loop.run_until_complete(main())
