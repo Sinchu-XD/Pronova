@@ -1,33 +1,46 @@
 from datetime import datetime
-from pymongo.errors import DuplicateKeyError
 from .Core import db
 from .Stats import inc_lifetime, inc_daily
 
 
+# ================= ADD USER =================
 async def add_user(user):
-    if not user or user.is_bot:
+    if not user or getattr(user, "is_bot", False):
         return
 
-    try:
-        await db.users.insert_one({
-            "user_id": user.id,
-            "join_date": datetime.utcnow(),
-        })
+    uid = int(user.id)
+
+    result = await db.users.update_one(
+        {"user_id": uid},
+        {
+            "$setOnInsert": {
+                "user_id": uid,
+                "join_date": datetime.utcnow(),
+            }
+        },
+        upsert=True,
+    )
+
+    # count only if new user
+    if result.upserted_id:
         await inc_lifetime("users")
         await inc_daily("users")
-    except DuplicateKeyError:
-        pass
 
 
+# ================= TOTAL =================
 async def total_users():
     return await db.users.count_documents({})
 
 
+# ================= GET USERS =================
 async def get_users():
-    async for u in db.users.find({}):
-        yield u["user_id"]
-      
+    async for u in db.users.find({}, {"user_id": 1}):
+        yield int(u.get("user_id"))
+
+
 # ================= REMOVE USER =================
 async def remove_user(user_id):
-    await db.users.delete_one({"user_id": user_id})
-    
+    if not user_id:
+        return
+
+    await db.users.delete_one({"user_id": int(user_id)})
