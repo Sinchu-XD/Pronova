@@ -19,20 +19,27 @@ SUDO_USERS = [7952773964]
 async def stats(_, m):
     msg = await m.reply(sc("fetching analytics..."))
 
-    users = await total_users()
-    chats = await total_chats()
-    songs = await get_lifetime("songs")
-    commands = await get_lifetime("commands")
+    try:
+        users = await total_users()
+        chats = await total_chats()
+        songs = await get_lifetime("songs")
+        commands = await get_lifetime("commands")
 
-    banned = await total_banned()
-    gbanned = len(await get_gbanned())
+        banned = await total_banned()
 
-    weekly_users = await sum_range(7, "users")
-    monthly_users = await sum_range(30, "users")
+        # safer (avoid heavy in future)
+        gbanned = len(await get_gbanned())
 
-    tg = await top_groups(3)
-    tu = await top_users(3)
-    mp = await most_played(3)
+        weekly_users = await sum_range(7, "users")
+        monthly_users = await sum_range(30, "users")
+
+        tg = await top_groups(3)
+        tu = await top_users(3)
+        mp = await most_played(3)
+
+    except Exception as e:
+        print("Stats Fetch Error:", e)
+        return await msg.edit(sc("failed to fetch stats"))
 
     text = f"""
 BOT ANALYTICS
@@ -74,5 +81,8 @@ Top Groups
     else:
         text += "No data\n"
 
-    await msg.edit(sc(text))
-    
+    try:
+        await msg.edit(sc(text))
+    except Exception as e:
+        print("Stats Edit Error:", e)
+        
