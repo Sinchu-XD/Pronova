@@ -26,7 +26,7 @@ def load_plugins():
     PLUGINS = [
         "Music",
         "Admins",
-        "Callbacks",
+        "CallBacks",
         "Start",
         "Afk",
         "GetActivity",
