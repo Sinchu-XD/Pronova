@@ -23,10 +23,18 @@ async def unban_user(chat_id, user_id):
 
 
 async def is_banned(chat_id, user_id):
-    return await db.banned.find_one({
+    data = await db.banned.find_one({
         "chat_id": chat_id,
         "user_id": user_id
     })
+    return bool(data)
+
+
+async def get_banned(chat_id):
+    users = []
+    async for x in db.banned.find({"chat_id": chat_id}):
+        users.append(x["user_id"])
+    return users
 
 
 async def total_banned():
@@ -47,4 +55,12 @@ async def ungban_user(user_id):
 
 
 async def is_gbanned(user_id):
-    return await db.gbanned.find_one({"user_id": user_id})
+    data = await db.gbanned.find_one({"user_id": user_id})
+    return bool(data)
+
+
+async def get_gbanned():
+    users = []
+    async for x in db.gbanned.find({}):
+        users.append(x["user_id"])
+    return users
