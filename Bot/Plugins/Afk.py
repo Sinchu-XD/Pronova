@@ -14,7 +14,12 @@ CACHE_LIMIT = 10000
 
 # ================= TIME FORMAT =================
 def format_time(seconds: int):
-    minutes, sec = divmod(int(seconds), 60)
+    try:
+        seconds = int(seconds)
+    except:
+        return "0s"
+
+    minutes, sec = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
 
@@ -31,14 +36,14 @@ def format_time(seconds: int):
 @bot.on_message(filters.command("afk"))
 async def set_afk(_, message: Message):
     user = message.from_user
-    if not user:
+    if not user or user.is_bot:
         return
 
     reason = "Away"
     if len(message.command) > 1:
         reason = " ".join(message.command[1:])
 
-    await set_afk_db(user.id, reason)
+    await set_afk_db(user, reason)
 
     text = sc(f"""
 AFK Enabled
@@ -55,21 +60,21 @@ I will inform anyone who mentions you.
 @bot.on_message(filters.all & ~filters.command("afk"))
 async def auto_remove_afk(_, message: Message):
     user = message.from_user
-    if not user:
+    if not user or user.is_bot:
         return
 
-    data = await get_afk(user.id)
+    data = await get_afk(user)
     if not data:
         return
 
     try:
         since = data["since"].timestamp()
-    except Exception:
+    except:
         since = time.time()
 
     duration = format_time(time.time() - since)
 
-    await remove_afk_db(user.id)
+    await remove_afk_db(user)
 
     text = sc(f"""
 Welcome Back
@@ -83,7 +88,7 @@ Away for : {duration}
 # ================= WATCH =================
 @bot.on_message(filters.group)
 async def afk_watcher(_, message: Message):
-    if not message.from_user:
+    if not message.from_user or message.from_user.is_bot:
         return
 
     targets = {}
@@ -119,7 +124,7 @@ async def afk_watcher(_, message: Message):
 
         try:
             since = data["since"].timestamp()
-        except Exception:
+        except:
             since = time.time()
 
         duration = format_time(time.time() - since)
@@ -132,4 +137,4 @@ Reason : {data.get('reason', 'Away')}
 """)
 
         await message.reply_text(f"{text}\n\n{user.mention}")
-
+        
