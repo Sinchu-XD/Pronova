@@ -23,7 +23,6 @@ async def daily_gc_report(app):
             now = datetime.now(IST)
             today = now.strftime("%d-%m-%Y")
 
-            # run once after midnight
             if now.hour == 0 and last_sent_date != today:
                 print("🕛 Sending Daily GC Reports")
                 last_sent_date = today
@@ -49,23 +48,20 @@ async def daily_gc_report(app):
                         except:
                             gname = str(chat_id)
 
-                        # ===== TOP 3 =====
+                        # ===== HEADER =====
+                        text = f"📊 {sc('daily activity report')}\n\n"
+                        text += f"🏠 {sc('group')} : {gname}\n\n"
+                        text += f"👥 {sc('active users')} : {active_users}\n"
+                        text += f"💬 {sc('total messages')} : {total_messages}\n\n"
+
+                        text += f"🏆 {sc('top 3 users')}\n"
+
+                        # ===== TOP USERS =====
                         top = sorted(
                             users.items(),
                             key=lambda x: x[1],
                             reverse=True
                         )[:3]
-
-                        text = f"""
-📊 Daily Activity Report
-
-🏠 Group : {gname}
-
-👥 Active Users : {active_users}
-💬 Total Messages : {total_messages}
-
-🏆 Top 3 Users
-"""
 
                         for i, (uid, count) in enumerate(top, start=1):
                             try:
@@ -81,18 +77,16 @@ async def daily_gc_report(app):
                             except:
                                 mention = f"`{uid}`"
 
-                            text += f"\n{i}. {mention} → {count}"
+                            text += f"{i}. {mention} → {count}\n"
 
-                        await app.send_message(chat_id, sc(text))
+                        await app.send_message(chat_id, text)
 
-                        # flood safety
                         await asyncio.sleep(2)
 
                     except Exception as e:
                         print(f"Report Error in {chat_id}:", e)
                         continue
 
-                # avoid repeat trigger
                 await asyncio.sleep(600)
 
         except Exception as e:
