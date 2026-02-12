@@ -1,50 +1,51 @@
 import os
 import asyncio
-import signal
+import importlib
 import traceback
+import signal
 
 from AbhiCalls import idle, Plugin
 from pyrogram import filters
 
 from Bot import bot, user, engine
 
-
-# ================= MANUAL IMPORT =================
-# PLUGINS
-import Bot.Plugins.Music
-import Bot.Plugins.Admins
-import Bot.Plugins.CallBacks
-import Bot.Plugins.Start
-import Bot.Plugins.Afk
-import Bot.Plugins.Broadcast
-import Bot.Plugins.Stats
-import Bot.Plugins.Bans
-import Bot.Plugins.GetActivity
-
-# HELPERS
-import Bot.Helper.Assistant
-import Bot.Helper.Font
-
-# DATABASE
-import Bot.Database.Core
-import Bot.Database.Users
-import Bot.Database.Chats
-import Bot.Database.Activity
-import Bot.Database.Stats
-import Bot.Database.Bans
-import Bot.Database.Afk
-import Bot.Database.Ranking
-import Bot.Database.Songs
-
-
-# ===== IMPORT FUNCTIONS =====
-from Bot.Plugins.GetActivity import daily_gc_report
+# ===== DATABASE =====
 from Bot.Database.Core import setup_database
 from Bot.Database.Users import add_user
 from Bot.Database.Chats import add_chat
 from Bot.Database.Activity import update_gc_activity
 from Bot.Database.Stats import inc_daily, inc_lifetime
+
+# ===== AUTO =====
+from Bot.Plugins.GetActivity import daily_gc_report
+
 from Bot.Helper.Assistant import setup_assistant
+
+
+# ================= PLUGIN LOADER =================
+def load_plugins():
+    print("\n📦 Loading Plugins...\n")
+
+    PLUGINS = [
+        "Music",
+        "Admins",
+        "CallBacks",
+        "Start",
+        "Afk",
+        "Broadcast",
+        "Stats",
+        "Bans"
+    ]
+
+    for plug in PLUGINS:
+        try:
+            importlib.import_module(f"Bot.Plugins.{plug}")
+            print(f"✅ {plug}")
+        except Exception:
+            print(f"❌ {plug}")
+            traceback.print_exc()
+
+    print("==============================\n")
 
 
 # ================= SAFE TASK =================
@@ -57,20 +58,19 @@ async def safe_task(coro, name):
 
 
 # ================= GLOBAL TRACKER =================
-# ALWAYS RUN LAST
-@bot.on_message(filters.private | filters.group, group=50)
+@bot.on_message(filters.private | filters.group)
 async def register(_, message):
     try:
         if not message.from_user or message.from_user.is_bot:
             return
 
         await add_user(message.from_user)
-        await add_chat(message.chat.id)
+        await add_chat(message.chat)
 
         if message.chat.type != "private":
-            await update_gc_activity(message.chat.id, message.from_user.id)
+            await update_gc_activity(message.chat, message.from_user)
 
-        if message.text and message.text.startswith("/"):
+        if message.command:
             await inc_lifetime("commands")
             await inc_daily("commands")
 
@@ -98,6 +98,9 @@ async def main():
     print("⚙️ setup assistant")
     await setup_assistant()
 
+    print("📦 load plugins")
+    load_plugins()
+
     print("🔌 load vc plugin")
     engine.vc.load_plugin(Plugin(bot))
 
@@ -109,6 +112,7 @@ async def main():
         total += len(handlers)
     print(f"Total Handlers: {total}\n")
 
+    # ===== START AUTOMATION =====
     print("📊 starting daily report scheduler")
     asyncio.create_task(safe_task(daily_gc_report(bot), "DailyActivity"))
 
