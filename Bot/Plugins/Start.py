@@ -11,7 +11,6 @@ BOT_NAME = "𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 𝑩𝒐𝒕🌷"
 MUSIC_STICKER = "CAACAgUAAx0CZzxBYgABB2zoaYjxDe3E6k4Spe_lmG-wfKUjdrYAAm8VAAKaqulXWtKxQoF0Y_UeBA"
 
 
-# prevent duplicate animations
 RUNNING = set()
 
 
@@ -91,7 +90,6 @@ async def start_handler(_, message: Message):
     if not user or user.is_bot:
         return
 
-    # ===== SAVE USER + CHAT =====
     try:
         await add_user(user)
         await add_chat(message.chat)
