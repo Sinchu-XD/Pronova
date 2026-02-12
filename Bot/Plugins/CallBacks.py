@@ -4,6 +4,7 @@ from Bot import bot, engine
 from Bot.Helper.Font import sc
 
 from Bot.Database.Bans import is_banned, is_gbanned
+from Bot.Database.Activity import update_gc_activity
 
 
 # ================= SAFE VC =================
@@ -13,6 +14,18 @@ async def safe_action(action, chat_id):
     except Exception as e:
         print("Callback VC Error:", e)
         return None
+
+
+# ================= ADMIN =================
+async def is_admin(chat_id, user_id):
+    try:
+        member = await bot.get_chat_member(chat_id, user_id)
+        return member.status in (
+            ChatMemberStatus.ADMINISTRATOR,
+            ChatMemberStatus.OWNER
+        )
+    except:
+        return False
 
 
 @bot.on_callback_query()
@@ -25,7 +38,7 @@ async def vc_buttons(_, cq):
         chat_id = m.chat.id
         user = cq.from_user
 
-        if not user:
+        if not user or user.is_bot:
             return await cq.answer()
 
         uid = user.id
@@ -38,12 +51,11 @@ async def vc_buttons(_, cq):
             return await cq.answer(sc("you are banned in this chat"), show_alert=True)
 
         # ===== ADMIN =====
-        member = await bot.get_chat_member(chat_id, uid)
-        if member.status not in (
-            ChatMemberStatus.ADMINISTRATOR,
-            ChatMemberStatus.OWNER
-        ):
+        if not await is_admin(chat_id, uid):
             return await cq.answer(sc("only admins"), show_alert=True)
+
+        # ===== ACTIVITY =====
+        await update_gc_activity(chat_id, uid)
 
         mention = user.mention
 
@@ -70,7 +82,6 @@ async def vc_buttons(_, cq):
                 await m.reply(sc("no previous song"))
 
         else:
-            # unknown callback
             return await cq.answer()
 
         await cq.answer()
