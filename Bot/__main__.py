@@ -5,16 +5,11 @@ import traceback
 import signal
 
 from AbhiCalls import idle, Plugin
-from pyrogram import filters
 
 from Bot import bot, user, engine
 
 # ===== DATABASE =====
 from Bot.Database.Core import setup_database
-from Bot.Database.Users import add_user
-from Bot.Database.Chats import add_chat
-from Bot.Database.Activity import update_gc_activity
-from Bot.Database.Stats import inc_daily, inc_lifetime
 
 # ===== AUTO =====
 from Bot.Plugins.GetActivity import daily_gc_report
@@ -66,41 +61,6 @@ async def safe_task(coro, name):
         print(f"{name} crashed:")
         traceback.print_exc()
 
-
-# ================= GLOBAL TRACKER =================
-
-# NORMAL MESSAGES ONLY
-@bot.on_message((filters.private | filters.group) & ~filters.command([]))
-async def register(_, message):
-    try:
-        if not message.from_user or message.from_user.is_bot:
-            return
-
-        await add_user(message.from_user)
-        await add_chat(message.chat.id)
-
-        if message.chat.type != "private":
-            await update_gc_activity(
-                message.chat.id,
-                message.from_user.id
-            )
-
-    except Exception as e:
-        print("Register Error:", e)
-
-
-# COMMAND COUNTER
-@bot.on_message(filters.command([]))
-async def command_tracker(_, message):
-    try:
-        if not message.from_user or message.from_user.is_bot:
-            return
-
-        await inc_lifetime("commands")
-        await inc_daily("commands")
-
-    except Exception as e:
-        print("Command Tracker Error:", e)
 
 # ================= MAIN =================
 async def main():
