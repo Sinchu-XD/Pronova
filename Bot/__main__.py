@@ -60,33 +60,45 @@ def load_all_modules():
 
 
 # ================= SAFE TASK =================
-async def safe_task(coro, name):
-    try:
-        await coro
-    except Exception:
-        print(f"{name} crashed:")
-        traceback.print_exc()
+async def main():
+    os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
+    os.environ["LINK"] = "https://t.me/Her4Eva"
 
+    print("📦 auto loading modules")
+    load_all_modules()  # ✅ BEFORE START
 
-# ================= GLOBAL TRACKER =================
-@bot.on_message(filters.private | filters.group)
-async def register(_, message):
-    try:
-        if not message.from_user or message.from_user.is_bot:
-            return
+    print("🤖 bot start")
+    await bot.start()
 
-        await add_user(message.from_user)
-        await add_chat(message.chat)
+    print("👤 assistant start")
+    await user.start()
 
-        if message.chat.type != "private":
-            await update_gc_activity(message.chat, message.from_user)
+    print("🎙 engine start")
+    await engine.start()
 
-        if message.command:
-            await inc_lifetime("commands")
-            await inc_daily("commands")
+    print("🗄 database setup")
+    await setup_database()
 
-    except Exception as e:
-        print("Register Error:", e)
+    print("⚙️ setup assistant")
+    await setup_assistant()
+
+    print("🔌 load vc plugin")
+    engine.vc.load_plugin(Plugin(bot))
+
+    # ===== HANDLER INFO =====
+    print("\n📡 Handler Info")
+    total = 0
+    for group, handlers in bot.dispatcher.groups.items():
+        print(f"Group {group}: {len(handlers)} handlers")
+        total += len(handlers)
+    print(f"Total Handlers: {total}\n")
+
+    print("📊 starting daily report scheduler")
+    asyncio.create_task(safe_task(daily_gc_report(bot), "DailyActivity"))
+
+    print("💤 bot running")
+    await idle()
+
 
 
 # ================= MAIN =================
