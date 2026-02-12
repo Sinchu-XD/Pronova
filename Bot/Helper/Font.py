@@ -9,21 +9,25 @@ SMALL_CAPS = {
 
 
 def sc(text: str) -> str:
-    words = text.split(" ")
-    final = []
+    if not text:
+        return ""
 
-    for word in words:
+    result = []
+
+    for word in text.split(" "):
         if not word:
-            final.append(word)
+            result.append(word)
             continue
 
-        first = word[0].upper()
-        rest = ""
+        first = word[0].upper() if word[0].isalpha() else word[0]
 
+        rest_chars = []
         for ch in word[1:]:
-            rest += SMALL_CAPS.get(ch.lower(), ch)
+            if ch.isalpha():
+                rest_chars.append(SMALL_CAPS.get(ch.lower(), ch))
+            else:
+                rest_chars.append(ch)
 
-        final.append(first + rest)
+        result.append(first + "".join(rest_chars))
 
-    return " ".join(final)
-  
+    return f"**{' '.join(result)}**"
