@@ -97,18 +97,8 @@ async def handle_play(m, force=False):
         if not song:
             return await m.reply(sc("unable to play audio"))
 
-        # ===== SAVE STATS =====
-        await inc_song_play(chat_id, title or query)
-
-        print("TRY ADD USER", m.from_user.id)
-
-        try:
-            await add_user(m.from_user)
-            await add_chat(chat_id)
-            print("USER SUCCESS")
-        except Exception as e:
-            print("USER FAIL:", e)
-
+        # ===== SAVE SONG =====
+        await inc_song_play(chat_id, title)
         return
 
     # ================= QUERY =================
@@ -130,23 +120,24 @@ async def handle_play(m, force=False):
     if not song:
         return await m.reply(sc("unable to play song"))
 
-    # ===== SAVE STATS =====
-        await inc_song_play(chat_id, title or query)
-
-        print("TRY ADD USER", m.from_user.id)
-
-        try:
-            await add_user(m.from_user)
-            await add_chat(chat_id)
-            print("USER SUCCESS")
-        except Exception as e:
-            print("USER FAIL:", e)
+    # ===== SAVE SONG =====
+    await inc_song_play(chat_id, title or query)
 
 
 # ================= PLAY =================
 @bot.on_message(filters.command("play"))
 async def play(_, m):
     await safe_delete(m)
+
+    # ===== SAVE USER + CHAT =====
+    if m.from_user:
+        try:
+            await add_user(m.from_user.id)
+            await add_chat(m.chat.id)
+            print("STATS UPDATED")
+        except Exception as e:
+            print("STATS FAIL:", e)
+
     await handle_play(m, force=False)
 
 
@@ -154,5 +145,15 @@ async def play(_, m):
 @bot.on_message(filters.command("playforce"))
 async def playforce(_, m):
     await safe_delete(m)
+
+    # ===== SAVE USER + CHAT =====
+    if m.from_user:
+        try:
+            await add_user(m.from_user.id)
+            await add_chat(m.chat.id)
+            print("STATS UPDATED")
+        except Exception as e:
+            print("STATS FAIL:", e)
+
     await handle_play(m, force=True)
     
