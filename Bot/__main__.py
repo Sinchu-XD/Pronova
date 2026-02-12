@@ -18,7 +18,6 @@ from Bot.Database.Stats import inc_daily, inc_lifetime
 
 # ===== AUTO =====
 from Bot.Plugins.GetActivity import daily_gc_report
-
 from Bot.Helper.Assistant import setup_assistant
 
 
@@ -66,53 +65,45 @@ async def safe_task(coro, name):
     except Exception:
         print(f"{name} crashed:")
         traceback.print_exc()
-        
-async def main():
-    os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
-    os.environ["LINK"] = "https://t.me/Her4Eva"
-
-    print("📦 auto loading modules")
-    load_all_modules()  # ✅ BEFORE START
-
-    print("🤖 bot start")
-    await bot.start()
-
-    print("👤 assistant start")
-    await user.start()
-
-    print("🎙 engine start")
-    await engine.start()
-
-    print("🗄 database setup")
-    await setup_database()
-
-    print("⚙️ setup assistant")
-    await setup_assistant()
-
-    print("🔌 load vc plugin")
-    engine.vc.load_plugin(Plugin(bot))
-
-    # ===== HANDLER INFO =====
-    print("\n📡 Handler Info")
-    total = 0
-    for group, handlers in bot.dispatcher.groups.items():
-        print(f"Group {group}: {len(handlers)} handlers")
-        total += len(handlers)
-    print(f"Total Handlers: {total}\n")
-
-    print("📊 starting daily report scheduler")
-    asyncio.create_task(safe_task(daily_gc_report(bot), "DailyActivity"))
-
-    print("💤 bot running")
-    await idle()
 
 
-"""
+# ================= GLOBAL TRACKER =================
+@bot.on_message(filters.private | filters.group)
+async def register(_, message):
+    try:
+        if not message.from_user or message.from_user.is_bot:
+            return
+
+        # ===== SAVE USER =====
+        await add_user(message.from_user)
+
+        # ===== SAVE CHAT =====
+        await add_chat(message.chat.id)
+
+        # ===== GROUP ACTIVITY =====
+        if message.chat.type != "private":
+            await update_gc_activity(
+                message.chat.id,
+                message.from_user.id
+            )
+
+        # ===== COMMAND STATS =====
+        if message.command:
+            await inc_lifetime("commands")
+            await inc_daily("commands")
+
+    except Exception as e:
+        print("Register Error:", e)
+
+
 # ================= MAIN =================
 async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
 
+    print("📦 auto loading modules")
+    load_all_modules()
+
     print("🤖 bot start")
     await bot.start()
 
@@ -127,9 +118,6 @@ async def main():
 
     print("⚙️ setup assistant")
     await setup_assistant()
-
-    print("📦 auto loading modules")
-    load_all_modules()
 
     print("🔌 load vc plugin")
     engine.vc.load_plugin(Plugin(bot))
@@ -148,7 +136,6 @@ async def main():
 
     print("💤 bot running")
     await idle()
-    """
 
 
 # ================= SHUTDOWN =================
