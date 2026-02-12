@@ -14,6 +14,7 @@ from Bot.Database.Core import db
 SUDO_USERS = [7952773964]
 
 DELAY = 0.25
+PROGRESS_EVERY = 200
 
 
 @bot.on_message(filters.command("broadcast") & filters.user(SUDO_USERS))
@@ -34,7 +35,7 @@ async def broadcast(_, message):
         total += 1
 
         try:
-            await msg.copy(user_id)
+            await msg.copy(int(user_id))
             success += 1
             await asyncio.sleep(DELAY)
 
@@ -43,7 +44,7 @@ async def broadcast(_, message):
             await asyncio.sleep(e.value + 1)
 
             try:
-                await msg.copy(user_id)
+                await msg.copy(int(user_id))
                 success += 1
             except Exception as er:
                 print("Retry Fail:", user_id, er)
@@ -61,7 +62,7 @@ async def broadcast(_, message):
             failed += 1
 
         # ===== PROGRESS =====
-        if total % 200 == 0:
+        if total % PROGRESS_EVERY == 0:
             try:
                 txt = sc(f"broadcasting...\n\nprocessed : {total}")
                 await status.edit(txt)
@@ -93,5 +94,8 @@ failed : {failed}
 time taken : {taken}s
 """)
 
-    await status.edit(final)
-    
+    try:
+        await status.edit(final)
+    except:
+        pass
+        
