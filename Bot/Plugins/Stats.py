@@ -11,8 +11,11 @@ from Bot.Database.Stats import get_lifetime, sum_range
 from Bot.Database.Bans import total_banned
 from Bot.Database.Core import db
 
-# ===== OWNER =====
+
 SUDO_USERS = [7952773964]
+
+USER_CACHE = {}
+CHAT_CACHE = {}
 
 
 @bot.on_message(filters.command("stats") & filters.user(SUDO_USERS))
@@ -61,8 +64,15 @@ Top Groups
     if tg:
         for i, (cid, s) in enumerate(tg, 1):
             try:
-                chat = await bot.get_chat(int(cid))
-                name = chat.title
+                cid = int(cid)
+
+                if cid in CHAT_CACHE:
+                    name = CHAT_CACHE[cid]
+                else:
+                    chat = await bot.get_chat(cid)
+                    name = chat.title
+                    CHAT_CACHE[cid] = name
+
             except:
                 name = cid
 
@@ -74,7 +84,20 @@ Top Groups
 
     if tu:
         for i, (uid, c) in enumerate(tu, 1):
-            text += f"{i}. {uid} → {c}\n"
+            try:
+                uid = int(uid)
+
+                if uid in USER_CACHE:
+                    mention = USER_CACHE[uid]
+                else:
+                    user = await bot.get_users(uid)
+                    mention = user.mention
+                    USER_CACHE[uid] = mention
+
+            except:
+                mention = uid
+
+            text += f"{i}. {mention} → {c}\n"
     else:
         text += "No data\n"
 
