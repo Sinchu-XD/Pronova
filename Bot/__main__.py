@@ -60,6 +60,13 @@ def load_all_modules():
 
 
 # ================= SAFE TASK =================
+async def safe_task(coro, name):
+    try:
+        await coro
+    except Exception:
+        print(f"{name} crashed:")
+        traceback.print_exc()
+        
 async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
