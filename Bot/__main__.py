@@ -15,7 +15,9 @@ from Bot.Database.Users import add_user
 from Bot.Database.Chats import add_chat
 from Bot.Database.Activity import update_gc_activity
 from Bot.Database.Stats import inc_daily, inc_lifetime
-
+import Bot.Plugins.Bans
+import Bot.Plugins.Broadcast
+import Bot.Plugins.Stats
 # ===== AUTO =====
 from Bot.Plugins.GetActivity import daily_gc_report
 
