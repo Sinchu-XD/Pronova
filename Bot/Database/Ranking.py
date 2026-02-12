@@ -11,10 +11,11 @@ async def top_groups(limit: int = 10):
         {"chat_id": 1, "songs": 1}
     ).sort("songs", -1).limit(limit):
 
-        res.append((
-            g.get("chat_id"),
-            int(g.get("songs", 0))
-        ))
+        cid = g.get("chat_id")
+        songs = int(g.get("songs", 0))
+
+        if cid and songs > 0:
+            res.append((int(cid), songs))
 
     return res
 
@@ -29,9 +30,13 @@ async def top_users(limit: int = 10):
     ):
         users = g.get("users", {})
 
-        # ensure dictionary
-        if isinstance(users, dict):
-            for uid in users.keys():
-                counter[int(uid)] += 1
+        if not isinstance(users, dict):
+            continue
+
+        for uid, count in users.items():
+            try:
+                counter[int(uid)] += int(count)
+            except:
+                continue
 
     return counter.most_common(limit)
