@@ -7,7 +7,6 @@ from Bot import bot
 from Bot.Helper.Font import sc
 
 from Bot.Database.Users import get_users, remove_user
-from Bot.Database.Chats import get_all_chats
 from Bot.Database.Stats import inc_lifetime
 from Bot.Database.Core import db
 
@@ -30,12 +29,20 @@ async def broadcast(_, message):
     success = 0
     failed = 0
 
+    # ⭐ ANTI DUPLICATE
+    sent_users = set()
+
     status = await message.reply(sc("broadcast started..."))
 
-    # ================= USERS =================
     async for user_id in get_users():
-        total += 1
         uid = int(user_id)
+
+        # ===== STOP DUPLICATE =====
+        if uid in sent_users:
+            continue
+
+        sent_users.add(uid)
+        total += 1
 
         try:
             await msg.copy(uid)
@@ -43,11 +50,14 @@ async def broadcast(_, message):
             await asyncio.sleep(DELAY)
 
         except FloodWait as e:
+            print(f"FloodWait {e.value}s")
             await asyncio.sleep(e.value + 1)
+
             try:
                 await msg.copy(uid)
                 success += 1
-            except:
+            except Exception as er:
+                print("Retry Fail:", uid, er)
                 failed += 1
 
         except (UserIsBlocked, PeerIdInvalid):
@@ -57,9 +67,11 @@ async def broadcast(_, message):
             except:
                 pass
 
-        except:
+        except Exception as e:
+            print("Broadcast Error:", uid, e)
             failed += 1
 
+        # ===== PROGRESS =====
         if total % PROGRESS_EVERY == 0:
             try:
                 txt = f"{sc('broadcasting')}\n\n{sc('processed')} : {total}"
@@ -67,35 +79,7 @@ async def broadcast(_, message):
             except:
                 pass
 
-    # ================= GROUPS =================
-    async for chat_id in get_all_chats():
-        total += 1
-        cid = int(chat_id)
-
-        try:
-            await msg.copy(cid)
-            success += 1
-            await asyncio.sleep(DELAY)
-
-        except FloodWait as e:
-            await asyncio.sleep(e.value + 1)
-            try:
-                await msg.copy(cid)
-                success += 1
-            except:
-                failed += 1
-
-        except:
-            failed += 1
-
-        if total % PROGRESS_EVERY == 0:
-            try:
-                txt = f"{sc('broadcasting')}\n\n{sc('processed')} : {total}"
-                await status.edit(txt)
-            except:
-                pass
-
-    # ================= LOG =================
+    # ===== LOG =====
     try:
         await db.broadcasts.insert_one({
             "total": total,
@@ -103,8 +87,8 @@ async def broadcast(_, message):
             "failed": failed,
             "time": int(time.time())
         })
-    except:
-        pass
+    except Exception as e:
+        print("Log Error:", e)
 
     await inc_lifetime("broadcasts")
 
@@ -112,7 +96,7 @@ async def broadcast(_, message):
 
     final = (
         f"✅ {sc('broadcast completed')}\n\n"
-        f"{sc('total targets')} : {total}\n"
+        f"{sc('total users')} : {total}\n"
         f"{sc('success')} : {success}\n"
         f"{sc('failed')} : {failed}\n\n"
         f"{sc('time taken')} : {taken}s"
