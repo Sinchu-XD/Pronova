@@ -33,7 +33,11 @@ import Bot.Database.Songs
 
 # ===== AUTO =====
 from Bot.Plugins.GetActivity import daily_gc_report
-
+from Bot.Database.Core import setup_database
+from Bot.Database.Users import add_user
+from Bot.Database.Chats import add_chat
+from Bot.Database.Activity import update_gc_activity
+from Bot.Database.Stats import inc_daily, inc_lifetime
 from Bot.Helper.Assistant import setup_assistant
 
 
