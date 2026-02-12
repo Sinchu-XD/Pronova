@@ -107,7 +107,7 @@ async def main():
     await idle()
 
 
-
+"""
 # ================= MAIN =================
 async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
@@ -148,6 +148,7 @@ async def main():
 
     print("💤 bot running")
     await idle()
+    """
 
 
 # ================= SHUTDOWN =================
