@@ -9,8 +9,8 @@ from Bot.Helper.Font import sc
 
 IST = pytz.timezone("Asia/Kolkata")
 
-# prevent duplicate send
 last_sent_date = None
+USER_CACHE = {}
 
 
 async def daily_gc_report(app):
@@ -31,7 +31,6 @@ async def daily_gc_report(app):
                 async for chat_id in get_all_chats():
                     try:
                         data = await get_gc_activity(chat_id)
-
                         if not data:
                             continue
 
@@ -70,8 +69,15 @@ async def daily_gc_report(app):
 
                         for i, (uid, count) in enumerate(top, start=1):
                             try:
-                                user = await app.get_users(int(uid))
-                                mention = user.mention
+                                uid = int(uid)
+
+                                if uid in USER_CACHE:
+                                    mention = USER_CACHE[uid]
+                                else:
+                                    user = await app.get_users(uid)
+                                    mention = user.mention
+                                    USER_CACHE[uid] = mention
+
                             except:
                                 mention = f"`{uid}`"
 
@@ -84,8 +90,9 @@ async def daily_gc_report(app):
 
                     except Exception as e:
                         print(f"Report Error in {chat_id}:", e)
+                        continue
 
-                # sleep so midnight repeat na ho
+                # avoid repeat trigger
                 await asyncio.sleep(600)
 
         except Exception as e:
