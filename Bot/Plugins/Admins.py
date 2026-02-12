@@ -5,6 +5,7 @@ from Bot import bot, engine
 from Bot.Helper.Font import sc
 
 from Bot.Database.Bans import is_banned, is_gbanned
+from Bot.Database.Activity import update_gc_activity
 
 
 # ================= ADMIN =================
@@ -12,11 +13,14 @@ async def is_admin(chat_id, user_id):
     if not user_id:
         return False
 
-    member = await bot.get_chat_member(chat_id, user_id)
-    return member.status in (
-        ChatMemberStatus.ADMINISTRATOR,
-        ChatMemberStatus.OWNER
-    )
+    try:
+        member = await bot.get_chat_member(chat_id, user_id)
+        return member.status in (
+            ChatMemberStatus.ADMINISTRATOR,
+            ChatMemberStatus.OWNER
+        )
+    except:
+        return False
 
 
 # ================= BAN =================
@@ -47,14 +51,25 @@ async def safe_vc_action(action, chat_id):
         return None
 
 
+# ================= COMMON CHECK =================
+async def admin_only(m):
+    if await check_ban(m):
+        return False
+
+    if not m.from_user or not await is_admin(m.chat.id, m.from_user.id):
+        await m.reply(sc("admins only"))
+        return False
+
+    # activity count
+    await update_gc_activity(m.chat, m.from_user)
+    return True
+
+
 # ================= SKIP =================
 @bot.on_message(filters.command("skip"))
 async def skip(_, m):
-    if await check_ban(m):
+    if not await admin_only(m):
         return
-
-    if not m.from_user or not await is_admin(m.chat.id, m.from_user.id):
-        return await m.reply(sc("admins only"))
 
     await safe_vc_action(engine.vc.skip, m.chat.id)
     await m.reply(sc("song skipped by") + " " + m.from_user.mention)
@@ -63,11 +78,8 @@ async def skip(_, m):
 # ================= STOP =================
 @bot.on_message(filters.command(["stop", "end"]))
 async def stop(_, m):
-    if await check_ban(m):
+    if not await admin_only(m):
         return
-
-    if not m.from_user or not await is_admin(m.chat.id, m.from_user.id):
-        return await m.reply(sc("admins only"))
 
     await safe_vc_action(engine.vc.stop, m.chat.id)
     await m.reply(sc("playback ended by") + " " + m.from_user.mention)
@@ -76,11 +88,8 @@ async def stop(_, m):
 # ================= PAUSE =================
 @bot.on_message(filters.command("pause"))
 async def pause(_, m):
-    if await check_ban(m):
+    if not await admin_only(m):
         return
-
-    if not m.from_user or not await is_admin(m.chat.id, m.from_user.id):
-        return await m.reply(sc("admins only"))
 
     await safe_vc_action(engine.vc.pause, m.chat.id)
     await m.reply(sc("paused by") + " " + m.from_user.mention)
@@ -89,11 +98,8 @@ async def pause(_, m):
 # ================= RESUME =================
 @bot.on_message(filters.command("resume"))
 async def resume(_, m):
-    if await check_ban(m):
+    if not await admin_only(m):
         return
-
-    if not m.from_user or not await is_admin(m.chat.id, m.from_user.id):
-        return await m.reply(sc("admins only"))
 
     await safe_vc_action(engine.vc.resume, m.chat.id)
     await m.reply(sc("resumed by") + " " + m.from_user.mention)
@@ -102,11 +108,8 @@ async def resume(_, m):
 # ================= PREVIOUS =================
 @bot.on_message(filters.command("previous"))
 async def previous(_, m):
-    if await check_ban(m):
+    if not await admin_only(m):
         return
-
-    if not m.from_user or not await is_admin(m.chat.id, m.from_user.id):
-        return await m.reply(sc("admins only"))
 
     ok = await safe_vc_action(engine.vc.previous, m.chat.id)
     if not ok:
@@ -118,11 +121,8 @@ async def previous(_, m):
 # ================= QUEUE =================
 @bot.on_message(filters.command("queue"))
 async def queue(_, m):
-    if await check_ban(m):
+    if not await admin_only(m):
         return
-
-    if not m.from_user or not await is_admin(m.chat.id, m.from_user.id):
-        return await m.reply(sc("admins only"))
 
     try:
         q = engine.vc.player.queues.get(m.chat.id)
