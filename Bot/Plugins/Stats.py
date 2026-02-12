@@ -1,3 +1,4 @@
+
 from pyrogram import filters
 
 from Bot import bot
@@ -42,25 +43,27 @@ async def stats(_, m):
         print("Stats Fetch Error:", e)
         return await msg.edit(sc("failed to fetch stats"))
 
-    text = f"""
-BOT ANALYTICS
+    # ================= HEADER =================
+    text = f"📊 {sc('bot analytics')}\n\n"
 
-Users : {users}
-Chats : {chats}
-Songs : {songs}
-Commands : {commands}
+    # ================= BASIC =================
+    text += f"{sc('users')} : {users}\n"
+    text += f"{sc('chats')} : {chats}\n"
+    text += f"{sc('songs')} : {songs}\n"
+    text += f"{sc('commands')} : {commands}\n\n"
 
-Banned (groups) : {banned}
-Gbanned (global) : {gbanned}
+    # ================= BANS =================
+    text += f"{sc('banned (groups)')} : {banned}\n"
+    text += f"{sc('gbanned (global)')} : {gbanned}\n\n"
 
-Growth
-7 Days : {weekly_users}
-30 Days : {monthly_users}
+    # ================= GROWTH =================
+    text += f"📈 {sc('growth')}\n"
+    text += f"7 {sc('days')} : {weekly_users}\n"
+    text += f"30 {sc('days')} : {monthly_users}\n\n"
 
-Top Groups
-"""
+    # ================= TOP GROUPS =================
+    text += f"🏆 {sc('top groups')}\n"
 
-    # ================= GROUP NAMES =================
     if tg:
         for i, (cid, s) in enumerate(tg, 1):
             try:
@@ -78,9 +81,10 @@ Top Groups
 
             text += f"{i}. {name} → {s}\n"
     else:
-        text += "No data\n"
+        text += f"{sc('no data')}\n"
 
-    text += "\nTop Users\n"
+    # ================= TOP USERS =================
+    text += f"\n👤 {sc('top users')}\n"
 
     if tu:
         for i, (uid, c) in enumerate(tu, 1):
@@ -99,18 +103,19 @@ Top Groups
 
             text += f"{i}. {mention} → {c}\n"
     else:
-        text += "No data\n"
+        text += f"{sc('no data')}\n"
 
-    text += "\nMost Played\n"
+    # ================= MOST PLAYED =================
+    text += f"\n🎧 {sc('most played')}\n"
 
     if mp:
         for i, (name, c) in enumerate(mp, 1):
             text += f"{i}. {name} → {c}\n"
     else:
-        text += "No data\n"
+        text += f"{sc('no data')}\n"
 
     try:
-        await msg.edit(sc(text))
+        await msg.edit(text)
     except Exception as e:
         print("Stats Edit Error:", e)
         
