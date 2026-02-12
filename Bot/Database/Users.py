@@ -5,10 +5,17 @@ from .Stats import inc_lifetime, inc_daily
 
 # ================= ADD USER =================
 async def add_user(user):
-    if not user or getattr(user, "is_bot", False):
+    if not user:
         return
 
-    uid = int(user.id)
+    # ===== accept both int and user object =====
+    if isinstance(user, int):
+        uid = int(user)
+    else:
+        # ignore bots
+        if getattr(user, "is_bot", False):
+            return
+        uid = int(user.id)
 
     result = await db.users.update_one(
         {"user_id": uid},
@@ -21,7 +28,7 @@ async def add_user(user):
         upsert=True,
     )
 
-    # count only if new user
+    # ===== increase counters only if new =====
     if result.upserted_id:
         await inc_lifetime("users")
         await inc_daily("users")
@@ -44,3 +51,4 @@ async def remove_user(user_id):
         return
 
     await db.users.delete_one({"user_id": int(user_id)})
+    
