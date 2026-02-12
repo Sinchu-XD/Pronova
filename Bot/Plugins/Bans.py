@@ -12,7 +12,6 @@ from Bot.Database.Bans import (
 )
 
 
-# ================= OWNER =================
 SUDO_USERS = [7952773964]
 
 
@@ -39,16 +38,12 @@ def get_target(m):
 
 
 def protected(target):
-    """prevent banning sudo / bot"""
     if not target:
         return True
-
     if target.is_bot:
         return True
-
     if target.id in SUDO_USERS:
         return True
-
     return False
 
 
@@ -68,7 +63,7 @@ async def ban(_, m):
     if protected(target):
         return await m.reply(sc("cannot ban this user"))
 
-    await ban_user(m.chat, target)
+    await ban_user(m.chat.id, target.id)
 
     text = sc("user banned from using bot")
     await m.reply(f"{text}\n\n{target.mention}")
@@ -87,7 +82,7 @@ async def unban(_, m):
     if not target:
         return await m.reply(sc("reply to user"))
 
-    await unban_user(m.chat, target)
+    await unban_user(m.chat.id, target.id)
 
     text = sc("user unbanned")
     await m.reply(f"{text}\n\n{target.mention}")
@@ -106,7 +101,7 @@ async def gban(_, m):
     if protected(target):
         return await m.reply(sc("cannot gban this user"))
 
-    await gban_user(target)
+    await gban_user(target.id)
 
     text = sc("user globally banned")
     await m.reply(f"{text}\n\n{target.mention}")
@@ -122,7 +117,7 @@ async def ungban(_, m):
     if not target:
         return await m.reply(sc("reply to user"))
 
-    await ungban_user(target)
+    await ungban_user(target.id)
 
     text = sc("user globally unbanned")
     await m.reply(f"{text}\n\n{target.mention}")
@@ -135,10 +130,10 @@ async def checkban(_, m):
     if not target:
         return await m.reply(sc("reply to user"))
 
-    if await is_gbanned(target):
+    if await is_gbanned(target.id):
         return await m.reply(sc("user is gbanned"))
 
-    if await is_banned(m.chat, target):
+    if await is_banned(m.chat.id, target.id):
         return await m.reply(sc("user is banned in this chat"))
 
     await m.reply(sc("user is free"))
@@ -153,8 +148,8 @@ async def total_banned_cmd(_, m):
     if not await is_admin(m.chat.id, m.from_user.id):
         return await m.reply(sc("admins only"))
 
-    users = await get_banned(m.chat)
-    await m.reply(sc(f"total banned users : {len(users)}"))
+    users = await get_banned(m.chat.id)
+    await m.reply(f"{sc('total banned users')} : {len(users)}")
 
 
 # ================= TOTAL GBANNED =================
@@ -164,5 +159,4 @@ async def total_gbanned_cmd(_, m):
         return await m.reply("sudo only")
 
     users = await get_gbanned()
-    await m.reply(sc(f"total gbanned users : {len(users)}"))
-    
+    await m.reply(f"{sc('total gbanned users')} : {len(users)}")
