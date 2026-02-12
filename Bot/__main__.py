@@ -1,15 +1,17 @@
+
 import os
 import asyncio
-import importlib
-import traceback
 import signal
+import traceback
 
 from AbhiCalls import idle, Plugin
 from pyrogram import filters
 
 from Bot import bot, user, engine
 
-# ===== DATABASE =====
+
+# ================= MANUAL IMPORT =================
+# PLUGINS
 import Bot.Plugins.Music
 import Bot.Plugins.Admins
 import Bot.Plugins.CallBacks
@@ -19,8 +21,12 @@ import Bot.Plugins.Broadcast
 import Bot.Plugins.Stats
 import Bot.Plugins.Bans
 import Bot.Plugins.GetActivity
+
+# HELPERS
 import Bot.Helper.Assistant
 import Bot.Helper.Font
+
+# DATABASE
 import Bot.Database.Core
 import Bot.Database.Users
 import Bot.Database.Chats
@@ -31,7 +37,8 @@ import Bot.Database.Afk
 import Bot.Database.Ranking
 import Bot.Database.Songs
 
-# ===== AUTO =====
+
+# ===== IMPORT FUNCTIONS =====
 from Bot.Plugins.GetActivity import daily_gc_report
 from Bot.Database.Core import setup_database
 from Bot.Database.Users import add_user
@@ -39,43 +46,6 @@ from Bot.Database.Chats import add_chat
 from Bot.Database.Activity import update_gc_activity
 from Bot.Database.Stats import inc_daily, inc_lifetime
 from Bot.Helper.Assistant import setup_assistant
-
-
-# ================= AUTO IMPORT =================
-def auto_import(folder_path, module_path):
-    print(f"\n📦 Loading {module_path}\n")
-
-    loaded = 0
-    failed = 0
-
-    if not os.path.exists(folder_path):
-        print("Folder not found.")
-        return
-
-    for file in os.listdir(folder_path):
-        if not file.endswith(".py") or file.startswith("__"):
-            continue
-
-        name = file[:-3]
-
-        try:
-            importlib.import_module(f"{module_path}.{name}")
-            print(f"✅ {name}")
-            loaded += 1
-        except Exception:
-            print(f"❌ {name}")
-            traceback.print_exc()
-            failed += 1
-
-    print(f"\nLoaded: {loaded} | Failed: {failed}")
-    print("==============================\n")
-
-
-# ================= LOAD EVERYTHING =================
-def load_all_modules():
-    auto_import("Bot/Database", "Bot.Database")
-    auto_import("Bot/Helper", "Bot.Helper")
-    auto_import("Bot/Plugins", "Bot.Plugins")
 
 
 # ================= SAFE TASK =================
@@ -112,9 +82,6 @@ async def register(_, message):
 async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
-
-    print("📦 auto loading modules")
-    load_all_modules()  # ✅ BEFORE START
 
     print("🤖 bot start")
     await bot.start()
