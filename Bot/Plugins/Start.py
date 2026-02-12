@@ -3,6 +3,8 @@ from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from Bot import bot
+from Bot.Database.Users import add_user
+from Bot.Database.Chats import add_chat
 
 
 BOT_NAME = "𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 𝑩𝒐𝒕🌷"
@@ -84,18 +86,19 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
 # ================= START =================
 @bot.on_message(filters.command("start") & filters.private)
 async def start_handler(_, message: Message):
-    if not message.from_user:
+    user = message.from_user
+
+    if not user or user.is_bot:
         return
 
     # ===== SAVE USER + CHAT =====
     try:
-        await add_user(message.from_user.id)
-        await add_chat(message.chat.id)
-        print("START STATS UPDATED")
+        await add_user(user)
+        await add_chat(message.chat)
     except Exception as e:
         print("START STATS FAIL:", e)
 
-    user_name = message.from_user.mention
+    user_name = user.mention
 
     try:
         await message.reply_sticker(MUSIC_STICKER)
@@ -112,3 +115,4 @@ async def start_handler(_, message: Message):
         return
 
     await pronova_ultimate_animation(status_msg, user_name)
+    
