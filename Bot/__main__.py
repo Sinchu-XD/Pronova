@@ -1,4 +1,3 @@
-
 import os
 import asyncio
 import signal
@@ -58,19 +57,20 @@ async def safe_task(coro, name):
 
 
 # ================= GLOBAL TRACKER =================
-@bot.on_message(filters.private | filters.group)
+# ALWAYS RUN LAST
+@bot.on_message(filters.private | filters.group, group=50)
 async def register(_, message):
     try:
         if not message.from_user or message.from_user.is_bot:
             return
 
         await add_user(message.from_user)
-        await add_chat(message.chat)
+        await add_chat(message.chat.id)
 
         if message.chat.type != "private":
-            await update_gc_activity(message.chat, message.from_user)
+            await update_gc_activity(message.chat.id, message.from_user.id)
 
-        if message.command:
+        if message.text and message.text.startswith("/"):
             await inc_lifetime("commands")
             await inc_daily("commands")
 
