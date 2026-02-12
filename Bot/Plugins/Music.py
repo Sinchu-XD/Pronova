@@ -98,9 +98,17 @@ async def handle_play(m, force=False):
             return await m.reply(sc("unable to play audio"))
 
         # ===== SAVE STATS =====
-        await inc_song_play(chat_id, title or "telegram audio")
-        await add_user(m.from_user)
-        await add_chat(chat_id)
+        await inc_song_play(chat_id, title or query)
+
+        print("TRY ADD USER", m.from_user.id)
+
+        try:
+            await add_user(m.from_user)
+            await add_chat(chat_id)
+            print("USER SUCCESS")
+        except Exception as e:
+            print("USER FAIL:", e)
+
         return
 
     # ================= QUERY =================
@@ -123,9 +131,16 @@ async def handle_play(m, force=False):
         return await m.reply(sc("unable to play song"))
 
     # ===== SAVE STATS =====
-    await inc_song_play(chat_id, title or query)
-    await add_user(m.from_user)
-    await add_chat(chat_id)
+        await inc_song_play(chat_id, title or query)
+
+        print("TRY ADD USER", m.from_user.id)
+
+        try:
+            await add_user(m.from_user)
+            await add_chat(chat_id)
+            print("USER SUCCESS")
+        except Exception as e:
+            print("USER FAIL:", e)
 
 
 # ================= PLAY =================
