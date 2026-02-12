@@ -69,20 +69,16 @@ async def safe_task(coro, name):
 
 # ================= GLOBAL TRACKER =================
 
-# ⭐ NORMAL CHAT (commands skip)
-@bot.on_message((filters.private | filters.group) & ~filters.command(None))
+# NORMAL MESSAGES ONLY
+@bot.on_message((filters.private | filters.group) & ~filters.command)
 async def register(_, message):
     try:
         if not message.from_user or message.from_user.is_bot:
             return
 
-        # SAVE USER
         await add_user(message.from_user)
-
-        # SAVE CHAT
         await add_chat(message.chat.id)
 
-        # GROUP ACTIVITY
         if message.chat.type != "private":
             await update_gc_activity(
                 message.chat.id,
@@ -93,8 +89,8 @@ async def register(_, message):
         print("Register Error:", e)
 
 
-# ⭐ COMMAND COUNTER ONLY
-@bot.on_message(filters.command(None))
+# COMMAND COUNTER
+@bot.on_message(filters.command)
 async def command_tracker(_, message):
     try:
         if not message.from_user or message.from_user.is_bot:
@@ -105,6 +101,7 @@ async def command_tracker(_, message):
 
     except Exception as e:
         print("Command Tracker Error:", e)
+
 
 # ================= MAIN =================
 async def main():
