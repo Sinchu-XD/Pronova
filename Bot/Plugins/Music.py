@@ -9,18 +9,19 @@ from Bot.Database.Songs import inc_song_play
 from Bot.Database.Bans import is_banned, is_gbanned
 from Bot.Database.Users import add_user
 from Bot.Database.Chats import add_chat
+from Bot.Database.Activity import update_gc_activity
 
 
 # ================= ADMIN CHECK =================
 async def is_admin(chat_id, user_id):
-    if not user_id:
+    try:
+        member = await bot.get_chat_member(chat_id, user_id)
+        return member.status in (
+            ChatMemberStatus.ADMINISTRATOR,
+            ChatMemberStatus.OWNER
+        )
+    except:
         return False
-
-    member = await bot.get_chat_member(chat_id, user_id)
-    return member.status in (
-        ChatMemberStatus.ADMINISTRATOR,
-        ChatMemberStatus.OWNER
-    )
 
 
 # ================= BAN CHECK =================
@@ -48,6 +49,19 @@ async def safe_delete(m):
         await m.delete()
     except:
         pass
+
+
+# ================= COMMON REGISTER =================
+async def register_usage(m):
+    if not m.from_user:
+        return
+
+    try:
+        await add_user(m.from_user)
+        await add_chat(m.chat)
+        await update_gc_activity(m.chat, m.from_user)
+    except Exception as e:
+        print("Usage Register Error:", e)
 
 
 # ================= PLAY LOGIC =================
@@ -97,7 +111,6 @@ async def handle_play(m, force=False):
         if not song:
             return await m.reply(sc("unable to play audio"))
 
-        # ===== SAVE SONG =====
         await inc_song_play(chat_id, title)
         return
 
@@ -120,7 +133,6 @@ async def handle_play(m, force=False):
     if not song:
         return await m.reply(sc("unable to play song"))
 
-    # ===== SAVE SONG =====
     await inc_song_play(chat_id, title or query)
 
 
@@ -128,16 +140,7 @@ async def handle_play(m, force=False):
 @bot.on_message(filters.command("play"))
 async def play(_, m):
     await safe_delete(m)
-
-    # ===== SAVE USER + CHAT =====
-    if m.from_user:
-        try:
-            await add_user(m.from_user.id)
-            await add_chat(m.chat.id)
-            print("STATS UPDATED")
-        except Exception as e:
-            print("STATS FAIL:", e)
-
+    await register_usage(m)
     await handle_play(m, force=False)
 
 
@@ -145,15 +148,6 @@ async def play(_, m):
 @bot.on_message(filters.command("playforce"))
 async def playforce(_, m):
     await safe_delete(m)
-
-    # ===== SAVE USER + CHAT =====
-    if m.from_user:
-        try:
-            await add_user(m.from_user.id)
-            await add_chat(m.chat.id)
-            print("STATS UPDATED")
-        except Exception as e:
-            print("STATS FAIL:", e)
-
+    await register_usage(m)
     await handle_play(m, force=True)
     
