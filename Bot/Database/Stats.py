@@ -13,7 +13,7 @@ async def inc_lifetime(key: str):
         return
 
     await db.lifetime.update_one(
-        {"_id": key},
+        {"_id": str(key)},
         {"$inc": {"count": 1}},
         upsert=True,
     )
@@ -24,10 +24,17 @@ async def get_lifetime(key: str) -> int:
         return 0
 
     data = await db.lifetime.find_one(
-        {"_id": key},
+        {"_id": str(key)},
         {"count": 1}
     )
-    return int(data.get("count", 0)) if data else 0
+
+    if not data:
+        return 0
+
+    try:
+        return int(data.get("count", 0))
+    except:
+        return 0
 
 
 # ================= DAILY =================
@@ -37,7 +44,7 @@ async def inc_daily(key: str):
 
     await db.daily.update_one(
         {"date": today()},
-        {"$inc": {key: 1}},
+        {"$inc": {str(key): 1}},
         upsert=True,
     )
 
@@ -60,6 +67,10 @@ async def sum_range(days: int, key: str) -> int:
         {"date": {"$in": dates}},
         {key: 1}
     ):
-        total += int(data.get(key, 0))
+        try:
+            total += int(data.get(key, 0))
+        except:
+            continue
 
     return total
+    
