@@ -22,30 +22,41 @@ from Bot.Plugins.GetActivity import daily_gc_report
 from Bot.Helper.Assistant import setup_assistant
 
 
-# ================= PLUGIN LOADER =================
-def load_plugins():
-    print("\n📦 Loading Plugins...\n")
+# ================= AUTO IMPORT =================
+def auto_import(folder_path, module_path):
+    print(f"\n📦 Loading {module_path}\n")
 
-    PLUGINS = [
-        "Music",
-        "Admins",
-        "CallBacks",
-        "Start",
-        "Afk",
-        "Broadcast",
-        "Stats",
-        "Bans"
-    ]
+    loaded = 0
+    failed = 0
 
-    for plug in PLUGINS:
+    if not os.path.exists(folder_path):
+        print("Folder not found.")
+        return
+
+    for file in os.listdir(folder_path):
+        if not file.endswith(".py") or file.startswith("__"):
+            continue
+
+        name = file[:-3]
+
         try:
-            importlib.import_module(f"Bot.Plugins.{plug}")
-            print(f"✅ {plug}")
+            importlib.import_module(f"{module_path}.{name}")
+            print(f"✅ {name}")
+            loaded += 1
         except Exception:
-            print(f"❌ {plug}")
+            print(f"❌ {name}")
             traceback.print_exc()
+            failed += 1
 
+    print(f"\nLoaded: {loaded} | Failed: {failed}")
     print("==============================\n")
+
+
+# ================= LOAD EVERYTHING =================
+def load_all_modules():
+    auto_import("Bot/Database", "Bot.Database")
+    auto_import("Bot/Helper", "Bot.Helper")
+    auto_import("Bot/Plugins", "Bot.Plugins")
 
 
 # ================= SAFE TASK =================
@@ -98,8 +109,8 @@ async def main():
     print("⚙️ setup assistant")
     await setup_assistant()
 
-    print("📦 load plugins")
-    load_plugins()
+    print("📦 auto loading modules")
+    load_all_modules()
 
     print("🔌 load vc plugin")
     engine.vc.load_plugin(Plugin(bot))
