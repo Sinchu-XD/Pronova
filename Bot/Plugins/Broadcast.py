@@ -33,9 +33,10 @@ async def broadcast(_, message):
 
     async for user_id in get_users():
         total += 1
+        uid = int(user_id)
 
         try:
-            await msg.copy(int(user_id))
+            await msg.copy(uid)
             success += 1
             await asyncio.sleep(DELAY)
 
@@ -44,27 +45,27 @@ async def broadcast(_, message):
             await asyncio.sleep(e.value + 1)
 
             try:
-                await msg.copy(int(user_id))
+                await msg.copy(uid)
                 success += 1
             except Exception as er:
-                print("Retry Fail:", user_id, er)
+                print("Retry Fail:", uid, er)
                 failed += 1
 
         except (UserIsBlocked, PeerIdInvalid):
             failed += 1
             try:
-                await remove_user(user_id)
+                await remove_user(uid)
             except:
                 pass
 
         except Exception as e:
-            print("Broadcast Error:", user_id, e)
+            print("Broadcast Error:", uid, e)
             failed += 1
 
         # ===== PROGRESS =====
         if total % PROGRESS_EVERY == 0:
             try:
-                txt = sc(f"broadcasting...\n\nprocessed : {total}")
+                txt = f"{sc('broadcasting')}\n\n{sc('processed')} : {total}"
                 await status.edit(txt)
             except:
                 pass
@@ -84,15 +85,14 @@ async def broadcast(_, message):
 
     taken = round(time.time() - start_time, 2)
 
-    final = sc(f"""
-broadcast completed
-
-total users : {total}
-success : {success}
-failed : {failed}
-
-time taken : {taken}s
-""")
+    # ❌ no sc on whole block
+    final = (
+        f"✅ {sc('broadcast completed')}\n\n"
+        f"{sc('total users')} : {total}\n"
+        f"{sc('success')} : {success}\n"
+        f"{sc('failed')} : {failed}\n\n"
+        f"{sc('time taken')} : {taken}s"
+    )
 
     try:
         await status.edit(final)
