@@ -87,6 +87,14 @@ async def start_handler(_, message: Message):
     if not message.from_user:
         return
 
+    # ===== SAVE USER + CHAT =====
+    try:
+        await add_user(message.from_user.id)
+        await add_chat(message.chat.id)
+        print("START STATS UPDATED")
+    except Exception as e:
+        print("START STATS FAIL:", e)
+
     user_name = message.from_user.mention
 
     try:
@@ -104,4 +112,3 @@ async def start_handler(_, message: Message):
         return
 
     await pronova_ultimate_animation(status_msg, user_name)
-    
