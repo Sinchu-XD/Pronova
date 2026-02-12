@@ -94,6 +94,9 @@ async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
 
+    print("📦 auto loading modules")
+    load_all_modules()  # ✅ BEFORE START
+
     print("🤖 bot start")
     await bot.start()
 
@@ -109,9 +112,6 @@ async def main():
     print("⚙️ setup assistant")
     await setup_assistant()
 
-    print("📦 auto loading modules")
-    load_all_modules()
-
     print("🔌 load vc plugin")
     engine.vc.load_plugin(Plugin(bot))
 
@@ -123,7 +123,6 @@ async def main():
         total += len(handlers)
     print(f"Total Handlers: {total}\n")
 
-    # ===== START AUTOMATION =====
     print("📊 starting daily report scheduler")
     asyncio.create_task(safe_task(daily_gc_report(bot), "DailyActivity"))
 
