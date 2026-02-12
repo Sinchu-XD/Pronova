@@ -10,14 +10,27 @@ from pyrogram import filters
 from Bot import bot, user, engine
 
 # ===== DATABASE =====
-from Bot.Database.Core import setup_database
-from Bot.Database.Users import add_user
-from Bot.Database.Chats import add_chat
-from Bot.Database.Activity import update_gc_activity
-from Bot.Database.Stats import inc_daily, inc_lifetime
-import Bot.Plugins.Bans
+import Bot.Plugins.Music
+import Bot.Plugins.Admins
+import Bot.Plugins.CallBacks
+import Bot.Plugins.Start
+import Bot.Plugins.Afk
 import Bot.Plugins.Broadcast
 import Bot.Plugins.Stats
+import Bot.Plugins.Bans
+import Bot.Plugins.GetActivity
+import Bot.Helper.Assistant
+import Bot.Helper.Font
+import Bot.Database.Core
+import Bot.Database.Users
+import Bot.Database.Chats
+import Bot.Database.Activity
+import Bot.Database.Stats
+import Bot.Database.Bans
+import Bot.Database.Afk
+import Bot.Database.Ranking
+import Bot.Database.Songs
+
 # ===== AUTO =====
 from Bot.Plugins.GetActivity import daily_gc_report
 
