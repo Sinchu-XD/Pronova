@@ -3,7 +3,11 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 
 # ================= CONFIG =================
-MONGO_URL = os.getenv("MONGO_URL", "mongodb+srv://Vexera:Vexera@vexera.wtrsmyc.mongodb.net/?appName=Vexera")
+MONGO_URL = os.getenv(
+    "MONGO_URL",
+    "mongodb+srv://Vexera:Vexera@vexera.wtrsmyc.mongodb.net/?appName=Vexera"
+)
+
 DB_NAME = os.getenv("DB_NAME", "Pronova")
 
 
@@ -20,6 +24,15 @@ db = client[DB_NAME]
 
 # ================= SETUP =================
 async def setup_database():
+    try:
+        # ===== TEST CONNECTION =====
+        await client.admin.command("ping")
+        print("✅ MongoDB Connected")
+    except Exception as e:
+        print("❌ MongoDB Connection Failed:", e)
+        return
+
+    # ===== INDEXES =====
     await db.users.create_index("user_id", unique=True)
     await db.chats.create_index("chat_id", unique=True)
     await db.group_stats.create_index("chat_id", unique=True)
@@ -34,3 +47,6 @@ async def setup_database():
     await db.daily.create_index("date", unique=True)
     await db.gc_activity.create_index("chat_id", unique=True)
     await db.afk.create_index("user_id", unique=True)
+
+    print("✅ MongoDB Indexes Ready")
+    
