@@ -8,6 +8,15 @@ from AbhiCalls import idle, Plugin
 
 from Bot import bot, user, engine
 
+import Bot.Plugins.Music
+import Bot.Plugins.Admins
+import Bot.Plugins.CallBacks
+import Bot.Plugins.Start
+import Bot.Plugins.Afk
+import Bot.Plugins.Broadcast
+import Bot.Plugins.Stats
+import Bot.Plugins.Bans
+import Bot.Plugins.GetActivity
 # ===== DATABASE =====
 from Bot.Database.Core import setup_database
 
