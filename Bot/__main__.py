@@ -12,7 +12,6 @@ from Bot import bot, user, engine
 from Bot.Database.Core import setup_database
 
 # ===== AUTO =====
-from Bot.Plugins.GetActivity import daily_gc_report
 from Bot.Helper.Assistant import setup_assistant
 
 
