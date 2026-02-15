@@ -13,19 +13,20 @@ aptPkgs = [
 
 [phases.install]
 cmds = [
-  # Node 20
-  "curl -fsSL https://deb.nodesource.com/setup_20.x | bash -",
-  "apt-get install -y nodejs",
+  # install python deps directly
+  "pip install --break-system-packages AbhiCalls",
+  "pip install --break-system-packages YouTubeMusic",
+  "pip install --break-system-packages pytz",
+  "pip install --break-system-packages motor",
+  "pip install --break-system-packages pymongo",
+  "pip install --break-system-packages tgcrypto",
+  "pip install --break-system-packages pyrofork",
+  "pip install --break-system-packages pyrogram",
 
-  # pipx
-  "pip install --break-system-packages pipx",
-
-  # requirements
-  "pip install --break-system-packages -r requirements.txt",
-
-  # pipx yt-dlp (no uninstall drama)
-  "python3 -m pipx install yt-dlp[default] || true"
+  # yt-dlp binary (best)
+  "curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp",
+  "chmod a+rx /usr/local/bin/yt-dlp"
 ]
 
 [phases.start]
-cmd = "export PATH=$PATH:/root/.local/bin && python3 -m Bot"
+cmd = "python3 -m Bot"
