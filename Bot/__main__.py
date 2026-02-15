@@ -1,55 +1,44 @@
 import os
 import asyncio
-import importlib
-import traceback
 import signal
 
 from AbhiCalls import idle, Plugin
 
 from Bot import bot, user, engine
 
-# ===== DATABASE =====
+
+# ================= MANUAL IMPORT =================
+
+# Plugins
+import Bot.Plugins.Music
+import Bot.Plugins.Admins
+import Bot.Plugins.CallBacks
+import Bot.Plugins.Start
+import Bot.Plugins.Afk
+import Bot.Plugins.Broadcast
+import Bot.Plugins.Stats
+import Bot.Plugins.Bans
+
+# Helpers
+import Bot.Helper.Assistant
+import Bot.Helper.Font
+
+# Database
+import Bot.Database.Core
+import Bot.Database.Users
+import Bot.Database.Chats
+import Bot.Database.Activity
+import Bot.Database.Stats
+import Bot.Database.Bans
+import Bot.Database.Afk
+import Bot.Database.Ranking
+import Bot.Database.Songs
+
+
+# ===== IMPORT FUNCTIONS =====
 from Bot.Database.Core import setup_database
-
-# ===== AUTO =====
 from Bot.Helper.Assistant import setup_assistant
-
-
-# ================= AUTO IMPORT =================
-def auto_import(folder_path, module_path):
-    print(f"\n📦 Loading {module_path}\n")
-
-    loaded = 0
-    failed = 0
-
-    if not os.path.exists(folder_path):
-        print("Folder not found.")
-        return
-
-    for file in os.listdir(folder_path):
-        if not file.endswith(".py") or file.startswith("__"):
-            continue
-
-        name = file[:-3]
-
-        try:
-            importlib.import_module(f"{module_path}.{name}")
-            print(f"✅")
-            loaded += 1
-        except Exception:
-            print(f"❌ {name}")
-            traceback.print_exc()
-            failed += 1
-
-    print(f"\nLoaded: {loaded} | Failed: {failed}")
-    print("==============================\n")
-
-
-# ================= LOAD EVERYTHING =================
-def load_all_modules():
-    auto_import("Bot/Database", "Bot.Database")
-    auto_import("Bot/Helper", "Bot.Helper")
-    auto_import("Bot/Plugins", "Bot.Plugins")
+from Bot.Plugins.GetActivity import daily_gc_report
 
 
 # ================= SAFE TASK =================
@@ -57,8 +46,7 @@ async def safe_task(coro, name):
     try:
         await coro
     except Exception:
-        print(f"{name} crashed:")
-        traceback.print_exc()
+        print(f"{name} crashed")
 
 
 # ================= MAIN =================
@@ -66,42 +54,38 @@ async def main():
     os.environ["TEXT"] = "⚡ 𝗣𝗼𝘄𝗲𝗿𝗲𝗱 𝗯𝘆 Abhishek ✨"
     os.environ["LINK"] = "https://t.me/Her4Eva"
 
-    print("📦 auto loading modules")
-    load_all_modules()
-
-    print("🤖 bot start")
+    print("🤖 Starting Bot")
     await bot.start()
 
-    print("👤 assistant start")
+    print("👤 Starting Assistant")
     await user.start()
 
-    print("🎙 engine start")
+    print("🎙 Starting Engine")
     await engine.start()
 
-    print("🗄 database setup")
+    print("🗄 Connecting Database")
     await setup_database()
 
-    print("⚙️ setup assistant")
+    print("⚙️ Loading Assistant Data")
     await setup_assistant()
 
-    print("🔌 load vc plugin")
+    print("🔌 VC Plugin Attach")
     engine.vc.load_plugin(Plugin(bot))
 
     # ===== HANDLER INFO =====
-    print("\n📡 Handler Info")
     total = 0
-    for group, handlers in bot.dispatcher.groups.items():
-        print(f"Group {group}: {len(handlers)} handlers")
+    for _, handlers in bot.dispatcher.groups.items():
         total += len(handlers)
-    print(f"Total Handlers: {total}\n")
+    print(f"📡 Handlers Loaded: {total}")
 
-    print("💤 bot running")
+
+    print("✅ Bot is running")
     await idle()
 
 
 # ================= SHUTDOWN =================
 async def shutdown():
-    print("\n🛑 Shutting down...")
+    print("🛑 Shutting down...")
     try:
         await engine.stop()
     except:
