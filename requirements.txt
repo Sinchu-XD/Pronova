@@ -3,3 +3,4 @@ YouTubeMusic
 pytz
 motor
 pymongo
+tgcrypto
