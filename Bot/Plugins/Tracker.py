@@ -6,7 +6,7 @@ from Bot.Database.Chats import add_chat
 from Bot.Database.Activity import update_gc_activity
 from Bot.Database.Stats import inc_lifetime, inc_daily
 
-
+"""
 # ================= MESSAGE TRACKER =================
 @bot.on_message(filters.private | filters.group)
 async def msg_tracker(_, message):
@@ -30,3 +30,4 @@ async def msg_tracker(_, message):
     except Exception as e:
         print("Tracker Error:", e)
       
+"""
