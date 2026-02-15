@@ -4,7 +4,10 @@ aptPkgs = [
   "curl",
   "python3",
   "python3-pip",
+  "python3-dev",
   "ffmpeg",
+  "gcc",
+  "libffi-dev",
   "build-essential"
 ]
 
@@ -14,16 +17,13 @@ cmds = [
   "curl -fsSL https://deb.nodesource.com/setup_20.x | bash -",
   "apt-get install -y nodejs",
 
-  # Install pipx
+  # pipx
   "pip install --break-system-packages pipx",
 
-  # Install bot requirements
+  # requirements
   "pip install --break-system-packages -r requirements.txt",
 
-  # remove pip yt-dlp
-  "pip uninstall -y yt-dlp || true",
-
-  # install yt-dlp via pipx (IMPORTANT)
+  # pipx yt-dlp (no uninstall drama)
   "python3 -m pipx install yt-dlp[default] || true"
 ]
 
