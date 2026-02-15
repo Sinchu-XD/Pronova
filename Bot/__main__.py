@@ -16,6 +16,8 @@ import Bot.Plugins.Afk
 import Bot.Plugins.Broadcast
 import Bot.Plugins.Stats
 import Bot.Plugins.Bans
+import Bot.Plugins.Info
+import Bot.Plugins.Tracker
 import Bot.Plugins.GetActivity
 # ===== DATABASE =====
 from Bot.Database.Core import setup_database
