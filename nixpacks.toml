@@ -3,7 +3,7 @@ aptPkgs = ["git", "curl", "nodejs", "python3-pip", "pipx"]
 
 [phases.install]
 cmds = [
+  "pip install -r requirements.txt",
   "pipx install yt-dlp[default] || true",
   "pipx ensurepath || true"
 ]
-
