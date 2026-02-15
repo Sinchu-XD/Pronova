@@ -38,8 +38,6 @@ import Bot.Database.Songs
 # ===== IMPORT FUNCTIONS =====
 from Bot.Database.Core import setup_database
 from Bot.Helper.Assistant import setup_assistant
-from Bot.Plugins.GetActivity import daily_gc_report
-
 
 # ================= SAFE TASK =================
 async def safe_task(coro, name):
