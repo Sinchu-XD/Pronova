@@ -1,0 +1,9 @@
+[phases.setup]
+aptPkgs = ["git", "curl", "nodejs", "python3-pip", "pipx"]
+
+[phases.install]
+cmds = [
+  "pipx install yt-dlp[default] || true",
+  "pipx ensurepath || true"
+]
+
