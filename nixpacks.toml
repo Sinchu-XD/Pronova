@@ -14,18 +14,17 @@ cmds = [
   "curl -fsSL https://deb.nodesource.com/setup_20.x | bash -",
   "apt-get install -y nodejs",
 
-  # pipx
+  # Install pipx
   "pip install --break-system-packages pipx",
-  "pipx ensurepath",
 
-  # bot requirements
+  # Install bot requirements
   "pip install --break-system-packages -r requirements.txt",
 
   # remove pip yt-dlp
   "pip uninstall -y yt-dlp || true",
 
-  # install yt-dlp via pipx
-  "pipx install yt-dlp[default] || true"
+  # install yt-dlp via pipx (IMPORTANT)
+  "python3 -m pipx install yt-dlp[default] || true"
 ]
 
 [phases.start]
