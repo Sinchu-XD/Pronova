@@ -10,24 +10,23 @@ aptPkgs = [
 
 [phases.install]
 cmds = [
-  # Install Node 20
+  # Node 20
   "curl -fsSL https://deb.nodesource.com/setup_20.x | bash -",
   "apt-get install -y nodejs",
 
-  # Install pipx
-  "python3 -m pip install --upgrade pip",
+  # pipx
   "pip install --break-system-packages pipx",
   "pipx ensurepath",
 
-  # Install bot requirements
+  # bot requirements
   "pip install --break-system-packages -r requirements.txt",
 
-  # Remove pip yt-dlp if exists
+  # remove pip yt-dlp
   "pip uninstall -y yt-dlp || true",
 
-  # Install yt-dlp via pipx
+  # install yt-dlp via pipx
   "pipx install yt-dlp[default] || true"
 ]
 
 [phases.start]
-cmd = "python3 -m Bot"
+cmd = "export PATH=$PATH:/root/.local/bin && python3 -m Bot"
