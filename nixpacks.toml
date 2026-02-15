@@ -1,3 +1,4 @@
+"""
 [phases.setup]
 aptPkgs = [
   "git",
@@ -30,3 +31,4 @@ cmds = [
 
 [phases.start]
 cmd = "python3 -m Bot"
+"""
