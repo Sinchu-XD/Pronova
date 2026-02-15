@@ -95,10 +95,6 @@ async def main():
         total += len(handlers)
     print(f"Total Handlers: {total}\n")
 
-    # ===== START AUTOMATION =====
-    print("📊 starting daily report scheduler")
-    asyncio.create_task(safe_task(daily_gc_report(bot), "DailyActivity"))
-
     print("💤 bot running")
     await idle()
 
