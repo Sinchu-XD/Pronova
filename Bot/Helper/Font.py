@@ -1,9 +1,3 @@
-import random
-from pyrogram.types import MessageEntity
-from pyrogram import enums
-from Bot import CUSTOM_EMOJI_IDS
-
-
 SMALL_CAPS = {
     "a": "ᴀ", "b": "ʙ", "c": "ᴄ", "d": "ᴅ", "e": "ᴇ",
     "f": "ғ", "g": "ɢ", "h": "ʜ", "i": "ɪ", "j": "ᴊ",
@@ -14,19 +8,28 @@ SMALL_CAPS = {
 }
 
 
-def sc(text: str, premium: bool = False):
+def sc(text: str):
+    """
+    Converts text to:
+    - First letter Capital
+    - Rest small caps
+    - Bold formatting
+    """
+
     if not text:
         return ""
 
-    result = []
+    words = []
 
     for word in text.split(" "):
         if not word:
-            result.append(word)
+            words.append(word)
             continue
 
+        # First letter Capital (normal)
         first = word[0].upper() if word[0].isalpha() else word[0]
 
+        # Rest Small Caps
         rest = []
         for ch in word[1:]:
             if ch.isalpha():
@@ -34,32 +37,6 @@ def sc(text: str, premium: bool = False):
             else:
                 rest.append(ch)
 
-        result.append(first + "".join(rest))
+        words.append(first + "".join(rest))
 
-    styled = f"**{' '.join(result)}**"
-
-    if not premium:
-        return styled
-
-    # ===== Premium Part =====
-    left_id = random.choice(CUSTOM_EMOJI_IDS)
-    right_id = random.choice(CUSTOM_EMOJI_IDS)
-
-    wrapped = f"❤️ {styled} ❤️"
-
-    entities = [
-        MessageEntity(
-            type=enums.MessageEntityType.CUSTOM_EMOJI,
-            offset=0,
-            length=1,
-            custom_emoji_id=left_id
-        ),
-        MessageEntity(
-            type=enums.MessageEntityType.CUSTOM_EMOJI,
-            offset=len(wrapped) - 1,
-            length=1,
-            custom_emoji_id=right_id
-        )
-    ]
-
-    return wrapped, entities
+    return f"**{' '.join(words)}**"
