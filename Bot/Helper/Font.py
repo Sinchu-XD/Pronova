@@ -14,7 +14,7 @@ SMALL_CAPS = {
 }
 
 
-def sc(text: str, entities: bool = False):
+def sc(text: str, premium: bool = False):
     if not text:
         return ""
 
@@ -27,24 +27,27 @@ def sc(text: str, entities: bool = False):
 
         first = word[0].upper() if word[0].isalpha() else word[0]
 
-        rest_chars = []
+        rest = []
         for ch in word[1:]:
             if ch.isalpha():
-                rest_chars.append(SMALL_CAPS.get(ch.lower(), ch))
+                rest.append(SMALL_CAPS.get(ch.lower(), ch))
             else:
-                rest_chars.append(ch)
+                rest.append(ch)
 
-        result.append(first + "".join(rest_chars))
+        result.append(first + "".join(rest))
 
     styled = f"**{' '.join(result)}**"
 
-    # ===== PREMIUM PART =====
+    if not premium:
+        return styled
+
+    # ===== Premium Part =====
     left_id = random.choice(CUSTOM_EMOJI_IDS)
     right_id = random.choice(CUSTOM_EMOJI_IDS)
 
-    final_text = f"❤️ {styled} ❤️"
+    wrapped = f"❤️ {styled} ❤️"
 
-    premium_entities = [
+    entities = [
         MessageEntity(
             type=enums.MessageEntityType.CUSTOM_EMOJI,
             offset=0,
@@ -53,13 +56,10 @@ def sc(text: str, entities: bool = False):
         ),
         MessageEntity(
             type=enums.MessageEntityType.CUSTOM_EMOJI,
-            offset=len(final_text) - 1,
+            offset=len(wrapped) - 1,
             length=1,
             custom_emoji_id=right_id
         )
     ]
 
-    if entities:
-        return final_text, premium_entities
-
-    return final_text
+    return wrapped, entities
