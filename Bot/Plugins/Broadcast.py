@@ -1,3 +1,4 @@
+print("BROADCAST PLUGIN LOADED")
 import asyncio
 import time
 from pyrogram import filters
