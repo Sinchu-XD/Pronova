@@ -3,8 +3,7 @@ print("STATS PLUGIN LOADED")
 from pyrogram import filters
 
 from Bot import bot
-from Bot.Helper.Font import sc
-from Bot.Helper.Emoji import add_premium_lr
+from Bot.Helper.Emoji import add_premium
 
 from Bot.Database.Users import total_users
 from Bot.Database.Chats import total_chats
@@ -24,8 +23,9 @@ CHAT_CACHE = {}
 @bot.on_message(filters.command("stats") & filters.user(SUDO_USERS))
 async def stats(_, m):
 
-    loading_text, ent = add_premium_lr(sc("fetching analytics"))
-    msg = await m.reply(loading_text, entities=ent)
+    # Loading
+    text, ent = add_premium("Fetching analytics")
+    msg = await m.reply(text, entities=ent)
 
     try:
         users = await total_users()
@@ -45,24 +45,25 @@ async def stats(_, m):
 
     except Exception as e:
         print("Stats Fetch Error:", e)
-        fail_text, ent = add_premium_lr(sc("failed to fetch stats"))
-        return await msg.edit(fail_text, entities=ent)
+        text, ent = add_premium("Failed to fetch stats")
+        return await msg.edit(text, entities=ent)
 
-    text = f"{sc('bot analytics')}\n\n"
+    # Build clean plain text (NO sc, NO markdown)
+    text = "Bot Analytics\n\n"
 
-    text += f"{sc('users')} : {users}\n"
-    text += f"{sc('chats')} : {chats}\n"
-    text += f"{sc('songs')} : {songs}\n"
-    text += f"{sc('commands')} : {commands}\n\n"
+    text += f"Users : {users}\n"
+    text += f"Chats : {chats}\n"
+    text += f"Songs : {songs}\n"
+    text += f"Commands : {commands}\n\n"
 
-    text += f"{sc('banned groups')} : {banned}\n"
-    text += f"{sc('gbanned global')} : {gbanned}\n\n"
+    text += f"Banned Groups : {banned}\n"
+    text += f"Globally Banned : {gbanned}\n\n"
 
-    text += f"{sc('growth')}\n"
-    text += f"7 {sc('days')} : {weekly_users}\n"
-    text += f"30 {sc('days')} : {monthly_users}\n\n"
+    text += "Growth\n"
+    text += f"7 Days : {weekly_users}\n"
+    text += f"30 Days : {monthly_users}\n\n"
 
-    text += f"{sc('top groups')}\n"
+    text += "Top Groups\n"
 
     if tg:
         for i, (cid, s) in enumerate(tg, 1):
@@ -79,9 +80,9 @@ async def stats(_, m):
 
             text += f"{i}. {name} → {s}\n"
     else:
-        text += f"{sc('no data')}\n"
+        text += "No data\n"
 
-    text += f"\n{sc('top users')}\n"
+    text += "\nTop Users\n"
 
     if tu:
         for i, (uid, c) in enumerate(tu, 1):
@@ -91,24 +92,25 @@ async def stats(_, m):
                     mention = USER_CACHE[uid]
                 else:
                     user = await bot.get_users(uid)
-                    mention = user.mention
+                    mention = user.first_name
                     USER_CACHE[uid] = mention
             except:
                 mention = uid
 
             text += f"{i}. {mention} → {c}\n"
     else:
-        text += f"{sc('no data')}\n"
+        text += "No data\n"
 
-    text += f"\n{sc('most played')}\n"
+    text += "\nMost Played\n"
 
     if mp:
         for i, (name, c) in enumerate(mp, 1):
             text += f"{i}. {name} → {c}\n"
     else:
-        text += f"{sc('no data')}\n"
+        text += "No data\n"
 
-    final_text, ent = add_premium_lr(text)
+    # Add premium emoji only once at end
+    final_text, ent = add_premium(text)
 
     try:
         await msg.edit(final_text, entities=ent)
