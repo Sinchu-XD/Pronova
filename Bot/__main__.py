@@ -4,7 +4,7 @@ import signal
 
 from AbhiCalls import idle, Plugin
 
-from Bot import bot, user, engine
+from Bot import bot, user, engine, CUSTOM_EMOJI_IDS
 
 
 # ================= MANUAL IMPORT =================
@@ -18,6 +18,7 @@ import Bot.Plugins.Afk
 import Bot.Plugins.Broadcast
 import Bot.Plugins.Stats
 import Bot.Plugins.Bans
+import Bot.Plugins.Test
 
 # Helpers
 import Bot.Helper.Font
