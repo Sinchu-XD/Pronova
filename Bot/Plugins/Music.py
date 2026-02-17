@@ -32,13 +32,13 @@ async def check_ban(m):
     chat_id = m.chat.id
 
     if await is_gbanned(uid):
-        text, ent = add_premium("You are gbanned")
-        await m.reply(text, entities=ent)
+        text = add_premium("You are gbanned")
+        await m.reply(text, parse_mode="html")
         return True
 
     if await is_banned(chat_id, uid):
-        text, ent = add_premium("You are banned in this chat")
-        await m.reply(text, entities=ent)
+        text = add_premium("You are banned in this chat")
+        await m.reply(text, parse_mode="html")
         return True
 
     return False
@@ -76,8 +76,8 @@ async def handle_play(m, force=False):
     uid = m.from_user.id
 
     if force and not await is_admin(chat_id, uid):
-        text, ent = add_premium("Admins only")
-        return await m.reply(text, entities=ent)
+        text = add_premium("Admins only")
+        return await m.reply(text, parse_mode="html")
 
     if not await get_ass(chat_id, m):
         return
@@ -95,8 +95,8 @@ async def handle_play(m, force=False):
         try:
             path = await reply.download()
         except:
-            text, ent = add_premium("Download failed")
-            return await m.reply(text, entities=ent)
+            text = add_premium("Download failed")
+            return await m.reply(text, parse_mode="html")
 
         try:
             song, title = await engine.vc.play_file(
@@ -106,22 +106,22 @@ async def handle_play(m, force=False):
                 reply=reply
             )
         except:
-            text, ent = add_premium("Unable to play audio")
-            return await m.reply(text, entities=ent)
+            text = add_premium("Unable to play audio")
+            return await m.reply(text, parse_mode="html")
 
         if not song:
-            text, ent = add_premium("Unable to play audio")
-            return await m.reply(text, entities=ent)
+            text = add_premium("Unable to play audio")
+            return await m.reply(text, parse_mode="html")
 
         await inc_song_play(chat_id, title)
 
-        text, ent = add_premium(f"Now Playing: {title}")
-        return await m.reply(text, entities=ent)
+        text = add_premium(f"Now Playing: {title}")
+        return await m.reply(text, parse_mode="html")
 
     # ================= TEXT QUERY =================
     if len(m.command) < 2:
-        text, ent = add_premium("Give song name")
-        return await m.reply(text, entities=ent)
+        text = add_premium("Give song name")
+        return await m.reply(text, parse_mode="html")
 
     query = m.text.split(None, 1)[1]
 
@@ -132,17 +132,17 @@ async def handle_play(m, force=False):
             m.from_user.mention
         )
     except:
-        text, ent = add_premium("Unable to play song")
-        return await m.reply(text, entities=ent)
+        text = add_premium("Unable to play song")
+        return await m.reply(text, parse_mode="html")
 
     if not song:
-        text, ent = add_premium("Unable to play song")
-        return await m.reply(text, entities=ent)
+        text = add_premium("Unable to play song")
+        return await m.reply(text, parse_mode="html")
 
     await inc_song_play(chat_id, title or query)
 
-    text, ent = add_premium(f"Now Playing: {title or query}")
-    await m.reply(text, entities=ent)
+    text = add_premium(f"Now Playing: {title or query}")
+    await m.reply(text, parse_mode="html")
 
 
 # ================= COMMANDS =================
@@ -163,6 +163,5 @@ async def playforce(_, m):
 # ================= DEBUG =================
 @bot.on_message(filters.command("debug"))
 async def debug(_, message):
-    text, ent = add_premium("Hello World")
-    await message.reply(text, entities=ent)
-    
+    text = add_premium("Hello World")
+    await message.reply(text, parse_mode="html")
