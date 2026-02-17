@@ -2,13 +2,12 @@ print("BROADCAST PLUGIN LOADED")
 
 import asyncio
 import time
-import random
-from pyrogram import filters, enums
+from pyrogram import filters
 from pyrogram.errors import FloodWait, UserIsBlocked, PeerIdInvalid
-from pyrogram.types import MessageEntity
 
-from Bot import bot, CUSTOM_EMOJI_IDS
+from Bot import bot
 from Bot.Helper.Font import sc
+from Bot.Helper.Emoji import add_premium
 from Bot.Database.Users import get_users, remove_user
 from Bot.Database.Chats import get_all_chats
 from Bot.Database.Stats import inc_lifetime
@@ -21,27 +20,11 @@ DELAY = 0.25
 PROGRESS_EVERY = 200
 
 
-# ================= EMOJI HELPER =================
-def add_random_emoji(text: str):
-    emoji_id = random.choice(CUSTOM_EMOJI_IDS)
-
-    text = text + " ❤️"
-
-    entity = MessageEntity(
-        type=enums.MessageEntityType.CUSTOM_EMOJI,
-        offset=len(text) - 1,
-        length=1,
-        custom_emoji_id=emoji_id
-    )
-
-    return text, [entity]
-
-
 @bot.on_message(filters.command("broadcast") & filters.user(SUDO_USERS))
 async def broadcast(_, message):
 
     if not message.reply_to_message:
-        text, ent = add_random_emoji("Reply to a message to broadcast.")
+        text, ent = add_premium(sc("reply to a message to broadcast"))
         return await message.reply(text, entities=ent)
 
     start_time = time.time()
@@ -51,7 +34,7 @@ async def broadcast(_, message):
     success = 0
     failed = 0
 
-    start_text, ent = add_random_emoji(sc("broadcast started..."))
+    start_text, ent = add_premium(sc("broadcast started"))
     status = await message.reply(start_text, entities=ent)
 
     # ================= USERS =================
@@ -84,8 +67,11 @@ async def broadcast(_, message):
 
         if total % PROGRESS_EVERY == 0:
             try:
-                txt = f"{sc('broadcasting')}\n\n{sc('processed')} : {total}"
-                txt, ent = add_random_emoji(txt)
+                txt = (
+                    f"{sc('broadcasting')}\n\n"
+                    f"{sc('processed')} : {total}"
+                )
+                txt, ent = add_premium(txt)
                 await status.edit(txt, entities=ent)
             except:
                 pass
@@ -113,8 +99,11 @@ async def broadcast(_, message):
 
         if total % PROGRESS_EVERY == 0:
             try:
-                txt = f"{sc('broadcasting')}\n\n{sc('processed')} : {total}"
-                txt, ent = add_random_emoji(txt)
+                txt = (
+                    f"{sc('broadcasting')}\n\n"
+                    f"{sc('processed')} : {total}"
+                )
+                txt, ent = add_premium(txt)
                 await status.edit(txt, entities=ent)
             except:
                 pass
@@ -135,14 +124,14 @@ async def broadcast(_, message):
     taken = round(time.time() - start_time, 2)
 
     final = (
-        f"✅ {sc('broadcast completed')}\n\n"
+        f"{sc('broadcast completed')}\n\n"
         f"{sc('total targets')} : {total}\n"
         f"{sc('success')} : {success}\n"
         f"{sc('failed')} : {failed}\n\n"
         f"{sc('time taken')} : {taken}s"
     )
 
-    final, ent = add_random_emoji(final)
+    final, ent = add_premium(final)
 
     try:
         await status.edit(final, entities=ent)
