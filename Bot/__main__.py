@@ -69,10 +69,24 @@ def premium_lr(text: str):
 
 
 # ===== Test Command =====
-@bot.on_message(filters.command("test"))
-async def test_command(_, message):
-    text, ent = premium_lr("Bot Working Fine 🔥")
-    await message.reply(text, entities=ent)
+@app.on_message(filters.command("test"))
+async def start_handler(client, message):
+
+    random_id = random.choice(EMOJI_IDS)
+
+    text = "Welcome ❤️"
+
+    entity = MessageEntity(
+        type=enums.MessageEntityType.CUSTOM_EMOJI,
+        offset=8,
+        length=1,
+        custom_emoji_id=random_id  # ✅ INT, not string
+    )
+
+    await message.reply_text(
+        text,
+        entities=[entity]
+    )
     
 # ================= MAIN =================
 async def main():
