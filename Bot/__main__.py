@@ -38,13 +38,6 @@ import Bot.Database.Songs
 from Bot.Database.Core import setup_database
 from Bot.Helper.Assistant import setup_assistant
 
-# ================= SAFE TASK =================
-async def safe_task(coro, name):
-    try:
-        await coro
-    except Exception:
-        print(f"{name} crashed")
-
 
 # ================= MAIN =================
 async def main():
