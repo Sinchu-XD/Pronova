@@ -1,5 +1,4 @@
-print("BROADCAST PLUGIN LOADED")
-
+Broadcast.py
 import asyncio
 import time
 from pyrogram import filters
@@ -7,7 +6,7 @@ from pyrogram.errors import FloodWait, UserIsBlocked, PeerIdInvalid
 
 from Bot import bot
 from Bot.Helper.Font import sc
-from Bot.Helper.Emoji import add_premium
+
 from Bot.Database.Users import get_users, remove_user
 from Bot.Database.Chats import get_all_chats
 from Bot.Database.Stats import inc_lifetime
@@ -22,10 +21,8 @@ PROGRESS_EVERY = 200
 
 @bot.on_message(filters.command("broadcast") & filters.user(SUDO_USERS))
 async def broadcast(_, message):
-
     if not message.reply_to_message:
-        text, ent = add_premium(sc("reply to a message to broadcast"))
-        return await message.reply(text, entities=ent)
+        return await message.reply("Reply to a message to broadcast.")
 
     start_time = time.time()
     msg = message.reply_to_message
@@ -34,8 +31,7 @@ async def broadcast(_, message):
     success = 0
     failed = 0
 
-    start_text, ent = add_premium(sc("broadcast started"))
-    status = await message.reply(start_text, entities=ent)
+    status = await message.reply(sc("broadcast started..."))
 
     # ================= USERS =================
     async for user_id in get_users():
@@ -67,12 +63,8 @@ async def broadcast(_, message):
 
         if total % PROGRESS_EVERY == 0:
             try:
-                txt = (
-                    f"{sc('broadcasting')}\n\n"
-                    f"{sc('processed')} : {total}"
-                )
-                txt, ent = add_premium(txt)
-                await status.edit(txt, entities=ent)
+                txt = f"{sc('broadcasting')}\n\n{sc('processed')} : {total}"
+                await status.edit(txt)
             except:
                 pass
 
@@ -99,12 +91,8 @@ async def broadcast(_, message):
 
         if total % PROGRESS_EVERY == 0:
             try:
-                txt = (
-                    f"{sc('broadcasting')}\n\n"
-                    f"{sc('processed')} : {total}"
-                )
-                txt, ent = add_premium(txt)
-                await status.edit(txt, entities=ent)
+                txt = f"{sc('broadcasting')}\n\n{sc('processed')} : {total}"
+                await status.edit(txt)
             except:
                 pass
 
@@ -124,17 +112,15 @@ async def broadcast(_, message):
     taken = round(time.time() - start_time, 2)
 
     final = (
-        f"{sc('broadcast completed')}\n\n"
+        f"✅ {sc('broadcast completed')}\n\n"
         f"{sc('total targets')} : {total}\n"
         f"{sc('success')} : {success}\n"
         f"{sc('failed')} : {failed}\n\n"
         f"{sc('time taken')} : {taken}s"
     )
 
-    final, ent = add_premium(final)
-
     try:
-        await status.edit(final, entities=ent)
+        await status.edit(final)
     except:
         pass
         
