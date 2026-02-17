@@ -20,11 +20,9 @@ import Bot.Plugins.Stats
 import Bot.Plugins.Bans
 
 # Helpers
-import Bot.Helper.Assistant
 import Bot.Helper.Font
 
 # Database
-import Bot.Database.Core
 import Bot.Database.Users
 import Bot.Database.Chats
 import Bot.Database.Stats
@@ -61,13 +59,6 @@ async def main():
 
     print("🔌 VC Plugin Attach")
     engine.vc.load_plugin(Plugin(bot))
-
-    # ===== HANDLER INFO =====
-    total = 0
-    for _, handlers in bot.dispatcher.groups.items():
-        total += len(handlers)
-    print(f"📡 Handlers Loaded: {total}")
-
 
     print("✅ Bot is running")
     await idle()
