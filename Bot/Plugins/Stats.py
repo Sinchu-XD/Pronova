@@ -1,4 +1,4 @@
-
+"""
 from pyrogram import filters
 
 from Bot import bot
@@ -119,3 +119,4 @@ async def stats(_, m):
     except Exception as e:
         print("Stats Edit Error:", e)
         
+"""
