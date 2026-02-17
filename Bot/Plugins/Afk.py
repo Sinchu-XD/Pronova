@@ -5,7 +5,6 @@ from pyrogram.types import Message
 
 from Bot import bot
 from Bot.Helper.Font import sc
-from Bot.Helper.Emoji import add_premium
 from Bot.Database.Afk import set_afk_db, get_afk, remove_afk_db
 
 
@@ -47,16 +46,15 @@ async def set_afk(_, message: Message):
 
     await set_afk_db(user, reason)
 
-    text = sc(
-        f"afk enabled\n\n"
-        f"reason : {reason}\n\n"
-        f"i will inform anyone who mentions you."
-    )
+    text = sc(f"""
+AFK Enabled
 
-    text = f"{text}\n\n{user.mention}"
-    text, ent = add_premium(text)
+Reason : {reason}
 
-    await message.reply_text(text, entities=ent)
+I will inform anyone who mentions you.
+""")
+
+    await message.reply_text(f"{text}\n\n{user.mention}")
 
 
 # ================= AUTO REMOVE =================
@@ -79,15 +77,13 @@ async def auto_remove_afk(_, message: Message):
 
     await remove_afk_db(user)
 
-    text = sc(
-        f"welcome back\n\n"
-        f"away for : {duration}"
-    )
+    text = sc(f"""
+Welcome Back
 
-    text = f"{text}\n\n{user.mention}"
-    text, ent = add_premium(text)
+Away for : {duration}
+""")
 
-    await message.reply_text(text, entities=ent)
+    await message.reply_text(f"{text}\n\n{user.mention}")
 
 
 # ================= WATCH =================
@@ -98,12 +94,12 @@ async def afk_watcher(_, message: Message):
 
     targets = {}
 
-    # Reply target
+    # ===== REPLY =====
     if message.reply_to_message and message.reply_to_message.from_user:
         u = message.reply_to_message.from_user
         targets[u.id] = u
 
-    # Mention targets
+    # ===== MENTIONS =====
     if message.mentions:
         for u in message.mentions:
             targets[u.id] = u
@@ -134,14 +130,12 @@ async def afk_watcher(_, message: Message):
 
         duration = format_time(time.time() - since)
 
-        text = sc(
-            f"user is afk\n\n"
-            f"last seen : {duration}\n"
-            f"reason : {data.get('reason', 'Away')}"
-        )
+        text = sc(f"""
+User is AFK
 
-        text = f"{text}\n\n{user.mention}"
-        text, ent = add_premium(text)
+Last Seen : {duration}
+Reason : {data.get('reason', 'Away')}
+""")
 
-        await message.reply_text(text, entities=ent)
+        await message.reply_text(f"{text}\n\n{user.mention}")
         
