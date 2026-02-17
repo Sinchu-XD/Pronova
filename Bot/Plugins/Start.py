@@ -84,7 +84,6 @@ async def pronova_ultimate_animation(message: Message, user):
         RUNNING.discard(key)
 
 
-
 # ===== START COMMAND =====
 @bot.on_message(filters.command("start") & filters.private)
 async def start_handler(_, message: Message):
