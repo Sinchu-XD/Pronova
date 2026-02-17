@@ -9,8 +9,6 @@ from Bot.Database.Songs import inc_song_play
 from Bot.Database.Bans import is_banned, is_gbanned
 from Bot.Database.Users import add_user
 from Bot.Database.Chats import add_chat
-from Bot.Database.Activity import update_gc_activity
-
 
 # ================= ADMIN CHECK =================
 async def is_admin(chat_id, user_id):
@@ -59,7 +57,6 @@ async def register_usage(m):
     try:
         await add_user(m.from_user)
         await add_chat(m.chat)
-        await update_gc_activity(m.chat, m.from_user)
     except Exception as e:
         print("Usage Register Error:", e)
 
