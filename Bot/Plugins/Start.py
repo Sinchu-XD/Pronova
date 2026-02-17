@@ -128,6 +128,7 @@ from pyrogram import filters, enums
 from pyrogram.types import MessageEntity
 
 from Bot import bot, CUSTOM_EMOJI_IDS
+from Bot.Helper.Font import sc
 
 
 # ===== Premium Left + Right Function =====
@@ -158,9 +159,12 @@ def premium_lr(text: str):
 # ===== Test Command =====
 @bot.on_message(filters.command("test"))
 async def test_command(_, message):
-    text, ent = premium_lr("Bot Working Fine 🔥")
+
+    raw_text = sc("bot working fine 🔥")  # Apply font styling first
+    text, ent = premium_lr(raw_text)      # Then wrap with premium
+
     await message.reply(text, entities=ent)
-  
+
 # ================= START =================
 @bot.on_message(filters.command("start") & filters.private)
 async def start_handler(_, message: Message):
