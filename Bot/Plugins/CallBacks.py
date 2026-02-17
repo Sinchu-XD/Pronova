@@ -1,9 +1,27 @@
+import random
+from pyrogram import enums
+from pyrogram.types import MessageEntity
 from pyrogram.enums import ChatMemberStatus
 
-from Bot import bot, engine
+from Bot import bot, engine, CUSTOM_EMOJI_IDS
 from Bot.Helper.Font import sc
-
 from Bot.Database.Bans import is_banned, is_gbanned
+
+
+# ================= EMOJI HELPER =================
+def add_random_emoji(text: str):
+    emoji_id = random.choice(CUSTOM_EMOJI_IDS)
+
+    text = text + " ❤️"
+
+    entity = MessageEntity(
+        type=enums.MessageEntityType.CUSTOM_EMOJI,
+        offset=len(text) - 1,
+        length=1,
+        custom_emoji_id=emoji_id
+    )
+
+    return text, [entity]
 
 
 # ================= SAFE VC =================
@@ -58,24 +76,29 @@ async def vc_buttons(_, cq):
         # ===== ACTIONS =====
         if cq.data == "vc_skip":
             await safe_action(engine.vc.skip, chat_id)
-            await m.reply(sc("song skipped by") + " " + mention)
+            text, ent = add_random_emoji(sc("song skipped by") + " " + mention)
+            await m.reply(text, entities=ent)
 
         elif cq.data == "vc_end":
             await safe_action(engine.vc.stop, chat_id)
-            await m.reply(sc("playback ended by") + " " + mention)
+            text, ent = add_random_emoji(sc("playback ended by") + " " + mention)
+            await m.reply(text, entities=ent)
 
         elif cq.data == "vc_pause":
             await safe_action(engine.vc.pause, chat_id)
-            await m.reply(sc("paused by") + " " + mention)
+            text, ent = add_random_emoji(sc("paused by") + " " + mention)
+            await m.reply(text, entities=ent)
 
         elif cq.data == "vc_resume":
             await safe_action(engine.vc.resume, chat_id)
-            await m.reply(sc("resumed by") + " " + mention)
+            text, ent = add_random_emoji(sc("resumed by") + " " + mention)
+            await m.reply(text, entities=ent)
 
         elif cq.data == "vc_previous":
             ok = await safe_action(engine.vc.previous, chat_id)
             if not ok:
-                await m.reply(sc("no previous song"))
+                text, ent = add_random_emoji(sc("no previous song"))
+                await m.reply(text, entities=ent)
 
         else:
             return await cq.answer()
