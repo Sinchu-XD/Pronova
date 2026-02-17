@@ -1,28 +1,23 @@
 import random
+from pyrogram.types import MessageEntity
+from pyrogram import enums
 from Bot import CUSTOM_EMOJI_IDS
 
 
-def _get_random_id():
-    return int(random.choice(CUSTOM_EMOJI_IDS))
-
-
 def add_premium(text: str):
-    emoji_id = _get_random_id()
-    return f'{text} <emoji id="{emoji_id}"></emoji>'
 
+    emoji_id = int(random.choice(CUSTOM_EMOJI_IDS))
 
-def add_premium_lr(text: str):
-    lines = text.split("\n")
-    final = ""
+    # Single ASCII placeholder
+    placeholder = "•"
 
-    for line in lines:
-        left = _get_random_id()
-        right = _get_random_id()
+    new_text = f"{text} {placeholder}"
 
-        final += (
-            f'<emoji id="{left}"></emoji> '
-            f'{line} '
-            f'<emoji id="{right}"></emoji>\n'
-        )
+    entity = MessageEntity(
+        type=enums.MessageEntityType.CUSTOM_EMOJI,
+        offset=len(new_text) - 1,
+        length=1,
+        custom_emoji_id=emoji_id
+    )
 
-    return final.rstrip("\n")
+    return new_text, [entity]
