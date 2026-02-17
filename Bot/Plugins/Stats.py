@@ -1,4 +1,4 @@
-
+print("STATS PLUGIN LOADED")
 from pyrogram import filters
 
 from Bot import bot
