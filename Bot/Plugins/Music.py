@@ -52,28 +52,28 @@ async def safe_delete(m):
         pass
 
 
-# ================= REGISTER USAGE =================
+# ================= REGISTER =================
 async def register_usage(m):
     if not m.from_user:
         return
-
     try:
         await add_user(m.from_user)
         await add_chat(m.chat)
-    except Exception as e:
-        print("Usage Register Error:", e)
+    except:
+        pass
 
 
 # ================= PLAY LOGIC =================
 async def handle_play(m, force=False):
+
     if await check_ban(m):
         return
 
     if not m.from_user:
         return
 
-    uid = m.from_user.id
     chat_id = m.chat.id
+    uid = m.from_user.id
 
     if force and not await is_admin(chat_id, uid):
         text, ent = add_premium("Admins only")
@@ -85,17 +85,16 @@ async def handle_play(m, force=False):
     if force:
         try:
             await engine.vc.stop(chat_id)
-        except Exception as e:
-            print("VC Stop Error:", e)
+        except:
+            pass
 
     reply = m.reply_to_message
 
-    # ================= AUDIO =================
+    # ================= AUDIO FILE =================
     if reply and (reply.voice or reply.audio):
         try:
             path = await reply.download()
-        except Exception as e:
-            print("Download Error:", e)
+        except:
             text, ent = add_premium("Download failed")
             return await m.reply(text, entities=ent)
 
@@ -106,8 +105,7 @@ async def handle_play(m, force=False):
                 m.from_user.mention,
                 reply=reply
             )
-        except Exception as e:
-            print("Play File Error:", e)
+        except:
             text, ent = add_premium("Unable to play audio")
             return await m.reply(text, entities=ent)
 
@@ -116,9 +114,11 @@ async def handle_play(m, force=False):
             return await m.reply(text, entities=ent)
 
         await inc_song_play(chat_id, title)
-        return
 
-    # ================= QUERY =================
+        text, ent = add_premium(f"Now Playing: {title}")
+        return await m.reply(text, entities=ent)
+
+    # ================= TEXT QUERY =================
     if len(m.command) < 2:
         text, ent = add_premium("Give song name")
         return await m.reply(text, entities=ent)
@@ -131,8 +131,7 @@ async def handle_play(m, force=False):
             query,
             m.from_user.mention
         )
-    except Exception as e:
-        print("Play Query Error:", e)
+    except:
         text, ent = add_premium("Unable to play song")
         return await m.reply(text, entities=ent)
 
@@ -142,8 +141,11 @@ async def handle_play(m, force=False):
 
     await inc_song_play(chat_id, title or query)
 
+    text, ent = add_premium(f"Now Playing: {title or query}")
+    await m.reply(text, entities=ent)
 
-# ================= PLAY =================
+
+# ================= COMMANDS =================
 @bot.on_message(filters.command("play"))
 async def play(_, m):
     await safe_delete(m)
@@ -151,16 +153,16 @@ async def play(_, m):
     await handle_play(m, force=False)
 
 
-# ================= PLAY FORCE =================
 @bot.on_message(filters.command("playforce"))
 async def playforce(_, m):
     await safe_delete(m)
     await register_usage(m)
     await handle_play(m, force=True)
-    
+
+
+# ================= DEBUG =================
 @bot.on_message(filters.command("debug"))
 async def debug(_, message):
-    text = "Hello World"
-    text, ent = add_premium(text)
+    text, ent = add_premium("Hello World")
     await message.reply(text, entities=ent)
     
