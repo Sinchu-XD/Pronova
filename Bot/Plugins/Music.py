@@ -158,3 +158,9 @@ async def playforce(_, m):
     await register_usage(m)
     await handle_play(m, force=True)
     
+@bot.on_message(filters.command("debug"))
+async def debug(_, message):
+    text = "Hello World"
+    text, ent = add_premium(text)
+    await message.reply(text, entities=ent)
+    
