@@ -35,7 +35,6 @@ async def pronova_ultimate_animation(message: Message, user):
     RUNNING.add(key)
 
     try:
-        # Boot animation
         boot = [
             sc("connecting to pronova network..."),
             sc("loading audio drivers..."),
@@ -50,18 +49,13 @@ async def pronova_ultimate_animation(message: Message, user):
         header = sc(BOT_NAME)
         line = "⎯" * 30
 
-        # ✅ SAFE mention handling (NO sc on mention)
-        welcome_text = f"{sc('hello')} {user.mention}, {sc('welcome to the next era of music.')}"
-        words = welcome_text.split()
+        # ✅ No split on mention
+        welcome_line = f"{sc('hello')} {user.mention}, {sc('welcome to the next era of music.')}"
+        frame = f"{header}\n{line}\n{welcome_line}\n{line}"
 
-        current = ""
-        for w in words:
-            current += w + " "
-            frame = f"{header}\n{line}\n{current}▎\n{line}"
-            await safe_edit(message, frame)
-            await asyncio.sleep(0.12)
+        await safe_edit(message, frame)
+        await asyncio.sleep(1)
 
-        # ===== FINAL DASHBOARD =====
         dashboard_plain = (
             f"{header}\n"
             f"{line}\n"
@@ -72,7 +66,6 @@ async def pronova_ultimate_animation(message: Message, user):
             f"{sc('tap below to start')}"
         )
 
-        # 🔥 Apply premium ONLY here
         text, ent = sc(dashboard_plain, premium=True)
 
         buttons = InlineKeyboardMarkup([
@@ -89,6 +82,7 @@ async def pronova_ultimate_animation(message: Message, user):
 
     finally:
         RUNNING.discard(key)
+
 
 
 # ===== START COMMAND =====
