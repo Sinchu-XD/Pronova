@@ -1,7 +1,9 @@
-from pyrogram import filters
+import random
+from pyrogram import filters, enums
+from pyrogram.types import MessageEntity
 from pyrogram.enums import ChatMemberStatus
 
-from Bot import bot, engine
+from Bot import bot, engine, CUSTOM_EMOJI_IDS
 from Bot.Helper.Assistant import get_ass
 from Bot.Helper.Font import sc
 
@@ -9,6 +11,23 @@ from Bot.Database.Songs import inc_song_play
 from Bot.Database.Bans import is_banned, is_gbanned
 from Bot.Database.Users import add_user
 from Bot.Database.Chats import add_chat
+
+
+# ================= EMOJI HELPER =================
+def add_random_emoji(text: str):
+    emoji_id = random.choice(CUSTOM_EMOJI_IDS)
+
+    text = text + " ❤️"
+
+    entity = MessageEntity(
+        type=enums.MessageEntityType.CUSTOM_EMOJI,
+        offset=len(text) - 1,
+        length=1,
+        custom_emoji_id=emoji_id
+    )
+
+    return text, [entity]
+
 
 # ================= ADMIN CHECK =================
 async def is_admin(chat_id, user_id):
@@ -31,11 +50,13 @@ async def check_ban(m):
     chat_id = m.chat.id
 
     if await is_gbanned(uid):
-        await m.reply(sc("you are gbanned"))
+        text, ent = add_random_emoji(sc("you are gbanned"))
+        await m.reply(text, entities=ent)
         return True
 
     if await is_banned(chat_id, uid):
-        await m.reply(sc("you are banned in this chat"))
+        text, ent = add_random_emoji(sc("you are banned in this chat"))
+        await m.reply(text, entities=ent)
         return True
 
     return False
@@ -73,7 +94,8 @@ async def handle_play(m, force=False):
     chat_id = m.chat.id
 
     if force and not await is_admin(chat_id, uid):
-        return await m.reply(sc("admins only"))
+        text, ent = add_random_emoji(sc("admins only"))
+        return await m.reply(text, entities=ent)
 
     if not await get_ass(chat_id, m):
         return
@@ -92,7 +114,8 @@ async def handle_play(m, force=False):
             path = await reply.download()
         except Exception as e:
             print("Download Error:", e)
-            return await m.reply(sc("download failed"))
+            text, ent = add_random_emoji(sc("download failed"))
+            return await m.reply(text, entities=ent)
 
         try:
             song, title = await engine.vc.play_file(
@@ -103,17 +126,20 @@ async def handle_play(m, force=False):
             )
         except Exception as e:
             print("Play File Error:", e)
-            return await m.reply(sc("unable to play audio"))
+            text, ent = add_random_emoji(sc("unable to play audio"))
+            return await m.reply(text, entities=ent)
 
         if not song:
-            return await m.reply(sc("unable to play audio"))
+            text, ent = add_random_emoji(sc("unable to play audio"))
+            return await m.reply(text, entities=ent)
 
         await inc_song_play(chat_id, title)
         return
 
     # ================= QUERY =================
     if len(m.command) < 2:
-        return await m.reply(sc("give song name"))
+        text, ent = add_random_emoji(sc("give song name"))
+        return await m.reply(text, entities=ent)
 
     query = m.text.split(None, 1)[1]
 
@@ -125,10 +151,12 @@ async def handle_play(m, force=False):
         )
     except Exception as e:
         print("Play Query Error:", e)
-        return await m.reply(sc("unable to play song"))
+        text, ent = add_random_emoji(sc("unable to play song"))
+        return await m.reply(text, entities=ent)
 
     if not song:
-        return await m.reply(sc("unable to play song"))
+        text, ent = add_random_emoji(sc("unable to play song"))
+        return await m.reply(text, entities=ent)
 
     await inc_song_play(chat_id, title or query)
 
