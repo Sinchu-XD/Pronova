@@ -4,7 +4,7 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from Bot import bot
 from Bot.Database.Users import add_user
-from Bot.Database.Chats import add_chat
+#from Bot.Database.Chats import add_chat
 
 
 BOT_NAME = "𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 𝑩𝒐𝒕🌷"
@@ -92,7 +92,6 @@ async def start_handler(_, message: Message):
 
     try:
         await add_user(user)
-        await add_chat(message.chat)
     except Exception as e:
         print("START STATS FAIL:", e)
 
