@@ -8,10 +8,9 @@ from pyrogram.types import (
 
 from Bot import bot
 from Bot.Database.Users import add_user
-from Bot.Helper.Font import sc
 
 
-BOT_NAME = "𝑷𝒓𝒐𝒏𝒐𝒗𝒂 𝑴𝒖𝒔𝒊𝒄 𝑩𝒐𝒕"
+BOT_NAME = "Pronova Music Bot"
 MUSIC_STICKER = "CAACAgUAAx0CZzxBYgABB2zoaYjxDe3E6k4Spe_lmG-wfKUjdrYAAm8VAAKaqulXWtKxQoF0Y_UeBA"
 
 RUNNING = set()
@@ -36,37 +35,34 @@ async def pronova_ultimate_animation(message: Message, user):
 
     try:
         boot = [
-            sc("connecting to pronova network..."),
-            sc("loading audio drivers..."),
-            sc("securing session..."),
-            sc("system ready.")
+            "Connecting to Pronova network...",
+            "Loading audio drivers...",
+            "Securing session...",
+            "System ready."
         ]
 
         for phase in boot:
             await safe_edit(message, phase)
             await asyncio.sleep(0.5)
 
-        header = sc(BOT_NAME)
+        header = BOT_NAME
         line = "⎯" * 30
 
-        # ✅ No split on mention
-        welcome_line = f"{sc('hello')} {user.mention}, {sc('welcome to the next era of music.')}"
+        welcome_line = f"Hello {user.mention}, welcome to the next era of music."
         frame = f"{header}\n{line}\n{welcome_line}\n{line}"
 
         await safe_edit(message, frame)
         await asyncio.sleep(1)
 
-        dashboard_plain = (
+        dashboard = (
             f"{header}\n"
             f"{line}\n"
-            f"{sc('user : premium')}\n"
-            f"{sc('quality : 24-bit')}\n"
-            f"{sc('latency : ultra low')}\n"
+            "User : Premium\n"
+            "Quality : 24-bit\n"
+            "Latency : Ultra Low\n"
             f"{line}\n"
-            f"{sc('tap below to start')}"
+            "Tap below to start"
         )
-
-        text, ent = sc(dashboard_plain, premium=True)
 
         buttons = InlineKeyboardMarkup([
             [InlineKeyboardButton("Add Pronova Music To Group", url="https://t.me/ProNovaMusicBot?startgroup=true")],
@@ -75,8 +71,7 @@ async def pronova_ultimate_animation(message: Message, user):
         ])
 
         await message.edit_text(
-            text,
-            entities=ent,
+            dashboard,
             reply_markup=buttons
         )
 
@@ -102,9 +97,9 @@ async def start_handler(_, message: Message):
     except:
         pass
 
-    await message.reply(sc("initializing pronova core..."))
+    await message.reply("Initializing Pronova Core...")
 
-    status = await message.reply(sc("loading system..."))
+    status = await message.reply("Loading system...")
 
     await pronova_ultimate_animation(status, user)
     
