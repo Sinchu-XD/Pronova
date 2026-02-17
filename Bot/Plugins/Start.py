@@ -7,6 +7,8 @@ from pyrogram.types import (
 )
 
 from Bot import bot
+from Bot.Helper.Font import sc
+from Bot.Helper.Emoji import add_premium
 from Bot.Database.Users import add_user
 
 
@@ -16,7 +18,7 @@ MUSIC_STICKER = "CAACAgUAAx0CZzxBYgABB2zoaYjxDe3E6k4Spe_lmG-wfKUjdrYAAm8VAAKaqul
 RUNNING = set()
 
 
-# ===== SAFE EDIT =====
+# ================= SAFE EDIT =================
 async def safe_edit(msg: Message, text: str):
     try:
         await msg.edit_text(text)
@@ -24,7 +26,7 @@ async def safe_edit(msg: Message, text: str):
         pass
 
 
-# ===== ANIMATION =====
+# ================= ANIMATION =================
 async def pronova_ultimate_animation(message: Message, user):
 
     key = (message.chat.id, message.id)
@@ -35,20 +37,20 @@ async def pronova_ultimate_animation(message: Message, user):
 
     try:
         boot = [
-            "Connecting to Pronova network...",
-            "Loading audio drivers...",
-            "Securing session...",
-            "System ready."
+            sc("connecting to pronova network"),
+            sc("loading audio drivers"),
+            sc("securing session"),
+            sc("system ready")
         ]
 
         for phase in boot:
             await safe_edit(message, phase)
             await asyncio.sleep(0.5)
 
-        header = BOT_NAME
+        header = sc(BOT_NAME)
         line = "⎯" * 30
 
-        welcome_line = f"Hello {user.mention}, welcome to the next era of music."
+        welcome_line = sc(f"hello {user.first_name}, welcome to the next era of music")
         frame = f"{header}\n{line}\n{welcome_line}\n{line}"
 
         await safe_edit(message, frame)
@@ -57,12 +59,14 @@ async def pronova_ultimate_animation(message: Message, user):
         dashboard = (
             f"{header}\n"
             f"{line}\n"
-            "User : Premium\n"
-            "Quality : 24-bit\n"
-            "Latency : Ultra Low\n"
+            f"{sc('user')} : Premium\n"
+            f"{sc('quality')} : 24-bit\n"
+            f"{sc('latency')} : Ultra Low\n"
             f"{line}\n"
-            "Tap below to start"
+            f"{sc('tap below to start')}"
         )
+
+        dashboard, ent = add_premium(dashboard)
 
         buttons = InlineKeyboardMarkup([
             [InlineKeyboardButton("Add Pronova Music To Group", url="https://t.me/ProNovaMusicBot?startgroup=true")],
@@ -72,6 +76,7 @@ async def pronova_ultimate_animation(message: Message, user):
 
         await message.edit_text(
             dashboard,
+            entities=ent,
             reply_markup=buttons
         )
 
@@ -79,7 +84,7 @@ async def pronova_ultimate_animation(message: Message, user):
         RUNNING.discard(key)
 
 
-# ===== START COMMAND =====
+# ================= START COMMAND =================
 @bot.on_message(filters.command("start") & filters.private)
 async def start_handler(_, message: Message):
 
@@ -97,9 +102,9 @@ async def start_handler(_, message: Message):
     except:
         pass
 
-    await message.reply("Initializing Pronova Core...")
+    await message.reply(sc("initializing pronova core"))
 
-    status = await message.reply("Loading system...")
+    status = await message.reply(sc("loading system"))
 
     await pronova_ultimate_animation(status, user)
     
