@@ -11,7 +11,6 @@ from Bot.Database.Users import add_user
 from Bot.Database.Chats import add_chat
 
 
-# ================= ADMIN CHECK =================
 async def is_admin(chat_id, user_id):
     try:
         member = await bot.get_chat_member(chat_id, user_id)
@@ -23,7 +22,6 @@ async def is_admin(chat_id, user_id):
         return False
 
 
-# ================= BAN CHECK =================
 async def check_ban(m):
     if not m.from_user:
         return True
@@ -32,38 +30,18 @@ async def check_ban(m):
     chat_id = m.chat.id
 
     if await is_gbanned(uid):
-        text = add_premium("You are gbanned")
-        await m.reply(text, parse_mode="html")
+        text, ent = add_premium("You are gbanned")
+        await m.reply(text, entities=ent)
         return True
 
     if await is_banned(chat_id, uid):
-        text = add_premium("You are banned in this chat")
-        await m.reply(text, parse_mode="html")
+        text, ent = add_premium("You are banned in this chat")
+        await m.reply(text, entities=ent)
         return True
 
     return False
 
 
-# ================= SAFE DELETE =================
-async def safe_delete(m):
-    try:
-        await m.delete()
-    except:
-        pass
-
-
-# ================= REGISTER =================
-async def register_usage(m):
-    if not m.from_user:
-        return
-    try:
-        await add_user(m.from_user)
-        await add_chat(m.chat)
-    except:
-        pass
-
-
-# ================= PLAY LOGIC =================
 async def handle_play(m, force=False):
 
     if await check_ban(m):
@@ -76,54 +54,17 @@ async def handle_play(m, force=False):
     uid = m.from_user.id
 
     if force and not await is_admin(chat_id, uid):
-        text = add_premium("Admins only")
-        return await m.reply(text, parse_mode="html")
+        text, ent = add_premium("Admins only")
+        return await m.reply(text, entities=ent)
 
     if not await get_ass(chat_id, m):
         return
 
-    if force:
-        try:
-            await engine.vc.stop(chat_id)
-        except:
-            pass
+    query = m.text.split(None, 1)[1] if len(m.command) > 1 else None
 
-    reply = m.reply_to_message
-
-    # ================= AUDIO FILE =================
-    if reply and (reply.voice or reply.audio):
-        try:
-            path = await reply.download()
-        except:
-            text = add_premium("Download failed")
-            return await m.reply(text, parse_mode="html")
-
-        try:
-            song, title = await engine.vc.play_file(
-                chat_id,
-                path,
-                m.from_user.mention,
-                reply=reply
-            )
-        except:
-            text = add_premium("Unable to play audio")
-            return await m.reply(text, parse_mode="html")
-
-        if not song:
-            text = add_premium("Unable to play audio")
-            return await m.reply(text, parse_mode="html")
-
-        await inc_song_play(chat_id, title)
-
-        text = add_premium(f"Now Playing: {title}")
-        return await m.reply(text, parse_mode="html")
-
-    # ================= TEXT QUERY =================
-    if len(m.command) < 2:
-        text = add_premium("Give song name")
-        return await m.reply(text, parse_mode="html")
-
-    query = m.text.split(None, 1)[1]
+    if not query:
+        text, ent = add_premium("Give song name")
+        return await m.reply(text, entities=ent)
 
     try:
         song, title = await engine.vc.play(
@@ -132,36 +73,26 @@ async def handle_play(m, force=False):
             m.from_user.mention
         )
     except:
-        text = add_premium("Unable to play song")
-        return await m.reply(text, parse_mode="html")
+        text, ent = add_premium("Unable to play song")
+        return await m.reply(text, entities=ent)
 
     if not song:
-        text = add_premium("Unable to play song")
-        return await m.reply(text, parse_mode="html")
+        text, ent = add_premium("Unable to play song")
+        return await m.reply(text, entities=ent)
 
     await inc_song_play(chat_id, title or query)
 
-    text = add_premium(f"Now Playing: {title or query}")
-    await m.reply(text, parse_mode="html")
+    text, ent = add_premium(f"Now Playing: {title or query}")
+    await m.reply(text, entities=ent)
 
 
-# ================= COMMANDS =================
 @bot.on_message(filters.command("play"))
 async def play(_, m):
-    await safe_delete(m)
-    await register_usage(m)
     await handle_play(m, force=False)
 
 
-@bot.on_message(filters.command("playforce"))
-async def playforce(_, m):
-    await safe_delete(m)
-    await register_usage(m)
-    await handle_play(m, force=True)
-
-
-# ================= DEBUG =================
 @bot.on_message(filters.command("debug"))
 async def debug(_, message):
-    text = add_premium("Hello World")
-    await message.reply(text, parse_mode="html")
+    text, ent = add_premium("Hello World")
+    await message.reply(text, entities=ent)
+    
