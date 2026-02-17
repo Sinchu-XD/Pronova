@@ -2,7 +2,7 @@ from pyrogram.enums import ChatMemberStatus
 
 from Bot import bot, engine
 from Bot.Helper.Font import sc
-from Bot.Helper.Emoji import add_premium
+
 from Bot.Database.Bans import is_banned, is_gbanned
 
 
@@ -15,7 +15,7 @@ async def safe_action(action, chat_id):
         return None
 
 
-# ================= ADMIN CHECK =================
+# ================= ADMIN =================
 async def is_admin(chat_id, user_id):
     try:
         member = await bot.get_chat_member(chat_id, user_id)
@@ -42,45 +42,40 @@ async def vc_buttons(_, cq):
 
         uid = user.id
 
-        # ================= BAN CHECK =================
+        # ===== BAN =====
         if await is_gbanned(uid):
             return await cq.answer(sc("you are gbanned"), show_alert=True)
 
         if await is_banned(chat_id, uid):
             return await cq.answer(sc("you are banned in this chat"), show_alert=True)
 
-        # ================= ADMIN CHECK =================
+        # ===== ADMIN =====
         if not await is_admin(chat_id, uid):
-            return await cq.answer(sc("admins only"), show_alert=True)
+            return await cq.answer(sc("only admins"), show_alert=True)
 
         mention = user.mention
 
-        # ================= ACTIONS =================
+        # ===== ACTIONS =====
         if cq.data == "vc_skip":
             await safe_action(engine.vc.skip, chat_id)
-            text, ent = add_premium(sc("song skipped by") + " " + mention)
-            await m.reply(text, entities=ent)
+            await m.reply(sc("song skipped by") + " " + mention)
 
         elif cq.data == "vc_end":
             await safe_action(engine.vc.stop, chat_id)
-            text, ent = add_premium(sc("playback ended by") + " " + mention)
-            await m.reply(text, entities=ent)
+            await m.reply(sc("playback ended by") + " " + mention)
 
         elif cq.data == "vc_pause":
             await safe_action(engine.vc.pause, chat_id)
-            text, ent = add_premium(sc("paused by") + " " + mention)
-            await m.reply(text, entities=ent)
+            await m.reply(sc("paused by") + " " + mention)
 
         elif cq.data == "vc_resume":
             await safe_action(engine.vc.resume, chat_id)
-            text, ent = add_premium(sc("resumed by") + " " + mention)
-            await m.reply(text, entities=ent)
+            await m.reply(sc("resumed by") + " " + mention)
 
         elif cq.data == "vc_previous":
             ok = await safe_action(engine.vc.previous, chat_id)
             if not ok:
-                text, ent = add_premium(sc("no previous song"))
-                await m.reply(text, entities=ent)
+                await m.reply(sc("no previous song"))
 
         else:
             return await cq.answer()
