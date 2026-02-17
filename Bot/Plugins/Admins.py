@@ -3,9 +3,7 @@ from pyrogram.enums import ChatMemberStatus
 
 from Bot import bot, engine
 from Bot.Helper.Font import sc
-
 from Bot.Database.Bans import is_banned, is_gbanned
-#from Bot.Database.Activity import update_gc_activity
 
 
 # ================= ADMIN =================
@@ -60,8 +58,6 @@ async def admin_only(m):
         await m.reply(sc("admins only"))
         return False
 
-    # activity count
-    await update_gc_activity(m.chat, m.from_user)
     return True
 
 
@@ -141,4 +137,3 @@ async def queue(_, m):
     except Exception as e:
         print("Queue Error:", e)
         await m.reply(sc("unable to fetch queue"))
-        
