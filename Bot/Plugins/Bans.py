@@ -1,3 +1,4 @@
+print("BANS PLUGIN LOADED")
 from pyrogram import filters
 from pyrogram.enums import ChatMemberStatus
 
