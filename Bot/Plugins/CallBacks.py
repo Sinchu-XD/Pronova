@@ -4,7 +4,6 @@ from Bot import bot, engine
 from Bot.Helper.Font import sc
 
 from Bot.Database.Bans import is_banned, is_gbanned
-from Bot.Database.Activity import update_gc_activity
 
 
 # ================= SAFE VC =================
@@ -53,9 +52,6 @@ async def vc_buttons(_, cq):
         # ===== ADMIN =====
         if not await is_admin(chat_id, uid):
             return await cq.answer(sc("only admins"), show_alert=True)
-
-        # ===== ACTIVITY =====
-        await update_gc_activity(chat_id, uid)
 
         mention = user.mention
 
