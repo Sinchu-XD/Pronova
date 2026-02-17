@@ -1,8 +1,9 @@
 import time
-from pyrogram import filters
-from pyrogram.types import Message
+import random
+from pyrogram import filters, enums
+from pyrogram.types import Message, MessageEntity
 
-from Bot import bot
+from Bot import bot, CUSTOM_EMOJI_IDS
 from Bot.Helper.Font import sc
 from Bot.Database.Afk import set_afk_db, get_afk, remove_afk_db
 
@@ -10,6 +11,22 @@ from Bot.Database.Afk import set_afk_db, get_afk, remove_afk_db
 LAST_REPLY = {}
 SPAM_COOLDOWN = 15
 CACHE_LIMIT = 10000
+
+
+# ================= EMOJI HELPER =================
+def add_random_emoji(text: str):
+    emoji_id = random.choice(CUSTOM_EMOJI_IDS)
+
+    text = text + " ❤️"
+
+    entity = MessageEntity(
+        type=enums.MessageEntityType.CUSTOM_EMOJI,
+        offset=len(text) - 1,
+        length=1,
+        custom_emoji_id=emoji_id
+    )
+
+    return text, [entity]
 
 
 # ================= TIME FORMAT =================
@@ -53,7 +70,10 @@ Reason : {reason}
 I will inform anyone who mentions you.
 """)
 
-    await message.reply_text(f"{text}\n\n{user.mention}")
+    text = f"{text}\n\n{user.mention}"
+    text, ent = add_random_emoji(text)
+
+    await message.reply_text(text, entities=ent)
 
 
 # ================= AUTO REMOVE =================
@@ -82,7 +102,10 @@ Welcome Back
 Away for : {duration}
 """)
 
-    await message.reply_text(f"{text}\n\n{user.mention}")
+    text = f"{text}\n\n{user.mention}"
+    text, ent = add_random_emoji(text)
+
+    await message.reply_text(text, entities=ent)
 
 
 # ================= WATCH =================
@@ -136,5 +159,8 @@ Last Seen : {duration}
 Reason : {data.get('reason', 'Away')}
 """)
 
-        await message.reply_text(f"{text}\n\n{user.mention}")
+        text = f"{text}\n\n{user.mention}"
+        text, ent = add_random_emoji(text)
+
+        await message.reply_text(text, entities=ent)
         
