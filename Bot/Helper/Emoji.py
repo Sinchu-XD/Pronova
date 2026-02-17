@@ -8,8 +8,7 @@ def _get_random_id():
 
 def add_premium(text: str):
     emoji_id = _get_random_id()
-    emoji_tag = f'<emoji id="{emoji_id}"></emoji>'
-    return f"{text} {emoji_tag}", None
+    return f'{text} <emoji id="{emoji_id}"></emoji>'
 
 
 def add_premium_lr(text: str):
@@ -17,13 +16,13 @@ def add_premium_lr(text: str):
     final = ""
 
     for line in lines:
-        left_id = _get_random_id()
-        right_id = _get_random_id()
+        left = _get_random_id()
+        right = _get_random_id()
 
-        left = f'<emoji id="{left_id}"></emoji>'
-        right = f'<emoji id="{right_id}"></emoji>'
+        final += (
+            f'<emoji id="{left}"></emoji> '
+            f'{line} '
+            f'<emoji id="{right}"></emoji>\n'
+        )
 
-        final += f"{left} {line} {right}\n"
-
-    return final.rstrip("\n"), None
-    
+    return final.rstrip("\n")
