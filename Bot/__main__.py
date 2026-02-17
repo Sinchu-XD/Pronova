@@ -69,7 +69,7 @@ def premium_lr(text: str):
 
 
 # ===== Test Command =====
-@app.on_message(filters.command("test"))
+@bot.on_message(filters.command("test"))
 async def start_handler(client, message):
 
     random_id = random.choice(EMOJI_IDS)
