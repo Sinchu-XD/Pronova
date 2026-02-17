@@ -17,10 +17,10 @@ MUSIC_STICKER = "CAACAgUAAx0CZzxBYgABB2zoaYjxDe3E6k4Spe_lmG-wfKUjdrYAAm8VAAKaqul
 RUNNING = set()
 
 
-# ===== SAFE EDIT (NO ENTITIES) =====
-async def safe_edit(msg: Message, text: str, **kwargs):
+# ===== SAFE EDIT (NO ENTITIES DURING ANIMATION) =====
+async def safe_edit(msg: Message, text: str):
     try:
-        await msg.edit_text(text, **kwargs)
+        await msg.edit_text(text)
     except:
         pass
 
@@ -35,6 +35,7 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
     RUNNING.add(key)
 
     try:
+        # Boot animation
         boot = [
             sc("connecting to pronova network..."),
             sc("loading audio drivers..."),
@@ -59,6 +60,7 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
             await safe_edit(message, frame)
             await asyncio.sleep(0.12)
 
+        # ===== FINAL DASHBOARD =====
         dashboard = (
             f"{header}\n"
             f"{line}\n"
@@ -69,8 +71,8 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
             f"{sc('tap below to start')}"
         )
 
-        # 🔥 Use sc premium mode only here
-        text, ent = sc("dashboard ready", premium=True)
+        # 🔥 Apply Premium ONLY here
+        text, ent = sc(dashboard, premium=True)
 
         buttons = InlineKeyboardMarkup([
             [InlineKeyboardButton("Add Pronova Music To Group", url="https://t.me/ProNovaMusicBot?startgroup=true")],
@@ -78,13 +80,17 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
             [InlineKeyboardButton("Bot Owner", url="https://t.me/WtfShia")]
         ])
 
-        await message.edit_text(dashboard, reply_markup=buttons)
+        await message.edit_text(
+            text,
+            entities=ent,
+            reply_markup=buttons
+        )
 
     finally:
         RUNNING.discard(key)
 
 
-# ===== START =====
+# ===== START COMMAND =====
 @bot.on_message(filters.command("start") & filters.private)
 async def start_handler(_, message: Message):
 
