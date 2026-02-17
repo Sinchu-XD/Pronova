@@ -27,7 +27,6 @@ import Bot.Helper.Font
 import Bot.Database.Core
 import Bot.Database.Users
 import Bot.Database.Chats
-import Bot.Database.Activity
 import Bot.Database.Stats
 import Bot.Database.Bans
 import Bot.Database.Afk
