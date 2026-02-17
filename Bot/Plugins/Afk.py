@@ -1,32 +1,17 @@
-import time
-import random
-from pyrogram import filters, enums
-from pyrogram.types import Message, MessageEntity
 
-from Bot import bot, CUSTOM_EMOJI_IDS
+import time
+from pyrogram import filters
+from pyrogram.types import Message
+
+from Bot import bot
 from Bot.Helper.Font import sc
+from Bot.Helper.Emoji import add_premium
 from Bot.Database.Afk import set_afk_db, get_afk, remove_afk_db
 
 
 LAST_REPLY = {}
 SPAM_COOLDOWN = 15
 CACHE_LIMIT = 10000
-
-
-# ================= EMOJI HELPER =================
-def add_random_emoji(text: str):
-    emoji_id = random.choice(CUSTOM_EMOJI_IDS)
-
-    text = text + " ❤️"
-
-    entity = MessageEntity(
-        type=enums.MessageEntityType.CUSTOM_EMOJI,
-        offset=len(text) - 1,
-        length=1,
-        custom_emoji_id=emoji_id
-    )
-
-    return text, [entity]
 
 
 # ================= TIME FORMAT =================
@@ -62,16 +47,14 @@ async def set_afk(_, message: Message):
 
     await set_afk_db(user, reason)
 
-    text = sc(f"""
-AFK Enabled
-
-Reason : {reason}
-
-I will inform anyone who mentions you.
-""")
+    text = sc(
+        f"afk enabled\n\n"
+        f"reason : {reason}\n\n"
+        f"i will inform anyone who mentions you."
+    )
 
     text = f"{text}\n\n{user.mention}"
-    text, ent = add_random_emoji(text)
+    text, ent = add_premium(text)
 
     await message.reply_text(text, entities=ent)
 
@@ -96,14 +79,13 @@ async def auto_remove_afk(_, message: Message):
 
     await remove_afk_db(user)
 
-    text = sc(f"""
-Welcome Back
-
-Away for : {duration}
-""")
+    text = sc(
+        f"welcome back\n\n"
+        f"away for : {duration}"
+    )
 
     text = f"{text}\n\n{user.mention}"
-    text, ent = add_random_emoji(text)
+    text, ent = add_premium(text)
 
     await message.reply_text(text, entities=ent)
 
@@ -116,12 +98,12 @@ async def afk_watcher(_, message: Message):
 
     targets = {}
 
-    # ===== REPLY =====
+    # Reply target
     if message.reply_to_message and message.reply_to_message.from_user:
         u = message.reply_to_message.from_user
         targets[u.id] = u
 
-    # ===== MENTIONS =====
+    # Mention targets
     if message.mentions:
         for u in message.mentions:
             targets[u.id] = u
@@ -152,15 +134,14 @@ async def afk_watcher(_, message: Message):
 
         duration = format_time(time.time() - since)
 
-        text = sc(f"""
-User is AFK
-
-Last Seen : {duration}
-Reason : {data.get('reason', 'Away')}
-""")
+        text = sc(
+            f"user is afk\n\n"
+            f"last seen : {duration}\n"
+            f"reason : {data.get('reason', 'Away')}"
+        )
 
         text = f"{text}\n\n{user.mention}"
-        text, ent = add_random_emoji(text)
+        text, ent = add_premium(text)
 
         await message.reply_text(text, entities=ent)
         
