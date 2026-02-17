@@ -17,7 +17,7 @@ MUSIC_STICKER = "CAACAgUAAx0CZzxBYgABB2zoaYjxDe3E6k4Spe_lmG-wfKUjdrYAAm8VAAKaqul
 RUNNING = set()
 
 
-# ===== SAFE EDIT (NO ENTITIES DURING ANIMATION) =====
+# ===== SAFE EDIT =====
 async def safe_edit(msg: Message, text: str):
     try:
         await msg.edit_text(text)
@@ -26,7 +26,7 @@ async def safe_edit(msg: Message, text: str):
 
 
 # ===== ANIMATION =====
-async def pronova_ultimate_animation(message: Message, user_name: str):
+async def pronova_ultimate_animation(message: Message, user):
 
     key = (message.chat.id, message.id)
     if key in RUNNING:
@@ -50,8 +50,9 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
         header = sc(BOT_NAME)
         line = "⎯" * 30
 
-        welcome = sc(f"hello {user_name}, welcome to the next era of music.")
-        words = welcome.split()
+        # ✅ SAFE mention handling (NO sc on mention)
+        welcome_text = f"{sc('hello')} {user.mention}, {sc('welcome to the next era of music.')}"
+        words = welcome_text.split()
 
         current = ""
         for w in words:
@@ -61,7 +62,7 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
             await asyncio.sleep(0.12)
 
         # ===== FINAL DASHBOARD =====
-        dashboard = (
+        dashboard_plain = (
             f"{header}\n"
             f"{line}\n"
             f"{sc('user : premium')}\n"
@@ -71,8 +72,8 @@ async def pronova_ultimate_animation(message: Message, user_name: str):
             f"{sc('tap below to start')}"
         )
 
-        # 🔥 Apply Premium ONLY here
-        text, ent = sc(dashboard, premium=True)
+        # 🔥 Apply premium ONLY here
+        text, ent = sc(dashboard_plain, premium=True)
 
         buttons = InlineKeyboardMarkup([
             [InlineKeyboardButton("Add Pronova Music To Group", url="https://t.me/ProNovaMusicBot?startgroup=true")],
@@ -112,5 +113,5 @@ async def start_handler(_, message: Message):
 
     status = await message.reply(sc("loading system..."))
 
-    await pronova_ultimate_animation(status, user.mention)
+    await pronova_ultimate_animation(status, user)
     
