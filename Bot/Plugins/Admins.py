@@ -5,7 +5,7 @@ from Bot import bot, engine
 from Bot.Helper.Font import sc
 
 from Bot.Database.Bans import is_banned, is_gbanned
-from Bot.Database.Activity import update_gc_activity
+#from Bot.Database.Activity import update_gc_activity
 
 
 # ================= ADMIN =================
