@@ -1,7 +1,10 @@
 print("STATS PLUGIN LOADED")
-from pyrogram import filters
 
-from Bot import bot
+import random
+from pyrogram import filters, enums
+from pyrogram.types import MessageEntity
+
+from Bot import bot, CUSTOM_EMOJI_IDS
 from Bot.Helper.Font import sc
 
 from Bot.Database.Users import total_users
@@ -19,9 +22,51 @@ USER_CACHE = {}
 CHAT_CACHE = {}
 
 
+# ================= PREMIUM LEFT + RIGHT =================
+def inject_premium_lr(text: str):
+    lines = text.split("\n")
+    final_text = ""
+    entities = []
+    offset = 0
+
+    for line in lines:
+        left_id = random.choice(CUSTOM_EMOJI_IDS)
+        right_id = random.choice(CUSTOM_EMOJI_IDS)
+
+        new_line = f"❤️ {line} ❤️"
+        final_text += new_line + "\n"
+
+        # Left emoji entity
+        entities.append(
+            MessageEntity(
+                type=enums.MessageEntityType.CUSTOM_EMOJI,
+                offset=offset,
+                length=1,
+                custom_emoji_id=left_id
+            )
+        )
+
+        # Right emoji entity
+        entities.append(
+            MessageEntity(
+                type=enums.MessageEntityType.CUSTOM_EMOJI,
+                offset=offset + len(new_line) - 1,
+                length=1,
+                custom_emoji_id=right_id
+            )
+        )
+
+        offset += len(new_line) + 1
+
+    final_text = final_text.rstrip("\n")
+    return final_text, entities
+
+
 @bot.on_message(filters.command("stats") & filters.user(SUDO_USERS))
 async def stats(_, m):
-    msg = await m.reply(sc("fetching analytics..."))
+
+    loading_text, ent = inject_premium_lr(sc("fetching analytics..."))
+    msg = await m.reply(loading_text, entities=ent)
 
     try:
         users = await total_users()
@@ -41,41 +86,35 @@ async def stats(_, m):
 
     except Exception as e:
         print("Stats Fetch Error:", e)
-        return await msg.edit(sc("failed to fetch stats"))
+        fail_text, ent = inject_premium_lr(sc("failed to fetch stats"))
+        return await msg.edit(fail_text, entities=ent)
 
-    # ================= HEADER =================
     text = f"📊 {sc('bot analytics')}\n\n"
 
-    # ================= BASIC =================
     text += f"{sc('users')} : {users}\n"
     text += f"{sc('chats')} : {chats}\n"
     text += f"{sc('songs')} : {songs}\n"
     text += f"{sc('commands')} : {commands}\n\n"
 
-    # ================= BANS =================
     text += f"{sc('banned (groups)')} : {banned}\n"
     text += f"{sc('gbanned (global)')} : {gbanned}\n\n"
 
-    # ================= GROWTH =================
     text += f"📈 {sc('growth')}\n"
     text += f"7 {sc('days')} : {weekly_users}\n"
     text += f"30 {sc('days')} : {monthly_users}\n\n"
 
-    # ================= TOP GROUPS =================
     text += f"🏆 {sc('top groups')}\n"
 
     if tg:
         for i, (cid, s) in enumerate(tg, 1):
             try:
                 cid = int(cid)
-
                 if cid in CHAT_CACHE:
                     name = CHAT_CACHE[cid]
                 else:
                     chat = await bot.get_chat(cid)
                     name = chat.title
                     CHAT_CACHE[cid] = name
-
             except:
                 name = cid
 
@@ -83,21 +122,18 @@ async def stats(_, m):
     else:
         text += f"{sc('no data')}\n"
 
-    # ================= TOP USERS =================
     text += f"\n👤 {sc('top users')}\n"
 
     if tu:
         for i, (uid, c) in enumerate(tu, 1):
             try:
                 uid = int(uid)
-
                 if uid in USER_CACHE:
                     mention = USER_CACHE[uid]
                 else:
                     user = await bot.get_users(uid)
                     mention = user.mention
                     USER_CACHE[uid] = mention
-
             except:
                 mention = uid
 
@@ -105,7 +141,6 @@ async def stats(_, m):
     else:
         text += f"{sc('no data')}\n"
 
-    # ================= MOST PLAYED =================
     text += f"\n🎧 {sc('most played')}\n"
 
     if mp:
@@ -114,8 +149,10 @@ async def stats(_, m):
     else:
         text += f"{sc('no data')}\n"
 
+    final_text, ent = inject_premium_lr(text)
+
     try:
-        await msg.edit(text)
+        await msg.edit(final_text, entities=ent)
     except Exception as e:
         print("Stats Edit Error:", e)
         
